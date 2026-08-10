@@ -1,0 +1,577 @@
+{
+    "ResultCount": 680,
+    "SearchParams": {
+        "DateFrom": "01/08/2026 12:00:00 AM",
+        "DateTo": "30/09/2026 12:00:00 AM",
+        "Query": null,
+        "Language": "id-id",
+        "KodeEmiten": null,
+        "EmitenType": "*",
+        "SortOrder": null,
+        "SortColumn": null,
+        "indexfrom": 0,
+        "pagesize": 10
+    },
+    "Replies": [
+        {
+            "pengumuman": {
+                "Id2": "20260805235332-002/MERS/VIII/CORSEC/26_id-id",
+                "EfekEmiten_DIRE": false,
+                "EfekEmiten_DINFRA": false,
+                "Id": 0,
+                "FinalId": null,
+                "OldFinalId": 0,
+                "NoPengumuman": "002/MERS/VIII/CORSEC/26",
+                "TglPengumuman": "2026-08-05T23:53:32",
+                "JudulPengumuman": "Penjelasan atas Permintaan Penjelasan Bursa",
+                "JenisPengumuman": "STOCK",
+                "Kode_Emiten": "EPAC                                                                                                ",
+                "CreatedDate": "2026-08-06T00:00:01",
+                "Form_Id": "10000",
+                "PerihalPengumuman": "Penjelasan atas Permintaan Pen",
+                "JMSXGroupID": "f-32118199-0",
+                "Divisi": "",
+                "KodeDivisi": "",
+                "JenisEmiten": null,
+                "EfekEmiten_Saham": true,
+                "EfekEmiten_Obligasi": false,
+                "EfekEmiten_EBA": false,
+                "EfekEmiten_ETF": false,
+                "EfekEmiten_SPEI": false
+            },
+            "attachments": [
+                {
+                    "Id": 0,
+                    "PDFFilename": "ce53dd7cd4_09ffcaba27.pdf",
+                    "FullSavePath": "https://www.idx.co.id/StaticData/NewsAndAnnouncement/ANNOUNCEMENTSTOCK/From_EREP/202608/ce53dd7cd4_09ffcaba27.pdf",
+                    "JMSXGroupID": null,
+                    "CorrelationID": null,
+                    "IsAttachment": false,
+                    "OriginalFilename": "20260805_EPAC_Tanggapan atas Permintaan Penjelasan Bursa_32118199.pdf"
+                },
+                {
+                    "Id": 0,
+                    "PDFFilename": "5228e2d0fe_8a1132ebf8.pdf",
+                    "FullSavePath": "https://www.idx.co.id/StaticData/NewsAndAnnouncement/ANNOUNCEMENTSTOCK/From_EREP/202608/5228e2d0fe_8a1132ebf8.pdf",
+                    "JMSXGroupID": null,
+                    "CorrelationID": null,
+                    "IsAttachment": true,
+                    "OriginalFilename": "20260805_EPAC_Tanggapan atas Permintaan Penjelasan Bursa_32118199_lamp1.pdf"
+                }
+            ]
+        },
+        {
+            "pengumuman": {
+                "Id2": "20260805233958-01-05/ICON/VIII/2026_id-id",
+                "EfekEmiten_DIRE": false,
+                "EfekEmiten_DINFRA": false,
+                "Id": 0,
+                "FinalId": null,
+                "OldFinalId": 0,
+                "NoPengumuman": "01-05/ICON/VIII/2026",
+                "TglPengumuman": "2026-08-05T23:39:58",
+                "JudulPengumuman": "Laporan Hasil Public Expose - Tahunan",
+                "JenisPengumuman": "STOCK",
+                "Kode_Emiten": "ICON                                                                                                ",
+                "CreatedDate": "2026-08-06T00:00:01",
+                "Form_Id": "10000",
+                "PerihalPengumuman": "Laporan Hasil Public Expose - ",
+                "JMSXGroupID": "f-32118198-0",
+                "Divisi": "",
+                "KodeDivisi": "",
+                "JenisEmiten": null,
+                "EfekEmiten_Saham": true,
+                "EfekEmiten_Obligasi": false,
+                "EfekEmiten_EBA": false,
+                "EfekEmiten_ETF": false,
+                "EfekEmiten_SPEI": false
+            },
+            "attachments": [
+                {
+                    "Id": 0,
+                    "PDFFilename": "284fb94b26_68435e68a0.pdf",
+                    "FullSavePath": "https://www.idx.co.id/StaticData/NewsAndAnnouncement/ANNOUNCEMENTSTOCK/From_EREP/202608/284fb94b26_68435e68a0.pdf",
+                    "JMSXGroupID": null,
+                    "CorrelationID": null,
+                    "IsAttachment": false,
+                    "OriginalFilename": "20260805_ICON_Public Expose_32118198.pdf"
+                },
+                {
+                    "Id": 0,
+                    "PDFFilename": "7c3308b91b_328d18b88f.pdf",
+                    "FullSavePath": "https://www.idx.co.id/StaticData/NewsAndAnnouncement/ANNOUNCEMENTSTOCK/From_EREP/202608/7c3308b91b_328d18b88f.pdf",
+                    "JMSXGroupID": null,
+                    "CorrelationID": null,
+                    "IsAttachment": true,
+                    "OriginalFilename": "20260805_ICON_Public Expose_32118198_lamp1.pdf"
+                }
+            ]
+        },
+        {
+            "pengumuman": {
+                "Id2": "20260805225352-001/RUPSLB/NASI/VIII/2026_id-id",
+                "EfekEmiten_DIRE": false,
+                "EfekEmiten_DINFRA": false,
+                "Id": 0,
+                "FinalId": null,
+                "OldFinalId": 0,
+                "NoPengumuman": "001/RUPSLB/NASI/VIII/2026",
+                "TglPengumuman": "2026-08-05T22:53:52",
+                "JudulPengumuman": "Ringkasan Risalah Rapat Umum Para Pemegang Saham Luar Biasa",
+                "JenisPengumuman": "STOCK",
+                "Kode_Emiten": "NASI                                                                                                ",
+                "CreatedDate": "2026-08-05T23:00:01",
+                "Form_Id": "10000",
+                "PerihalPengumuman": "Ringkasan Risalah Rapat Umum P",
+                "JMSXGroupID": "f-32118197-0",
+                "Divisi": "",
+                "KodeDivisi": "",
+                "JenisEmiten": null,
+                "EfekEmiten_Saham": true,
+                "EfekEmiten_Obligasi": false,
+                "EfekEmiten_EBA": false,
+                "EfekEmiten_ETF": false,
+                "EfekEmiten_SPEI": false
+            },
+            "attachments": [
+                {
+                    "Id": 0,
+                    "PDFFilename": "971530c4c2_e84c2c77ec.pdf",
+                    "FullSavePath": "https://www.idx.co.id/StaticData/NewsAndAnnouncement/ANNOUNCEMENTSTOCK/From_EREP/202608/971530c4c2_e84c2c77ec.pdf",
+                    "JMSXGroupID": null,
+                    "CorrelationID": null,
+                    "IsAttachment": false,
+                    "OriginalFilename": "20260805_NASI_Ringkasan Risalah//Risalah RUPS_32118197.pdf"
+                },
+                {
+                    "Id": 0,
+                    "PDFFilename": "20edf7c87c_07d891abc6.pdf",
+                    "FullSavePath": "https://www.idx.co.id/StaticData/NewsAndAnnouncement/ANNOUNCEMENTSTOCK/From_EREP/202608/20edf7c87c_07d891abc6.pdf",
+                    "JMSXGroupID": null,
+                    "CorrelationID": null,
+                    "IsAttachment": true,
+                    "OriginalFilename": "20260805_NASI_Ringkasan Risalah//Risalah RUPS_32118197_lamp1.pdf"
+                }
+            ]
+        },
+        {
+            "pengumuman": {
+                "Id2": "20260805221941-008A/CORPSEC/PMJS/lV/2026_id-id",
+                "EfekEmiten_DIRE": false,
+                "EfekEmiten_DINFRA": false,
+                "Id": 0,
+                "FinalId": null,
+                "OldFinalId": 0,
+                "NoPengumuman": "008A/CORPSEC/PMJS/lV/2026",
+                "TglPengumuman": "2026-08-05T22:19:41",
+                "JudulPengumuman": "Penyampaian Laporan Tahunan & Keberlanjutan dan ESG (KOREKSI)",
+                "JenisPengumuman": "STOCK",
+                "Kode_Emiten": "PMJS                                                                                                ",
+                "CreatedDate": "2026-08-05T22:30:02",
+                "Form_Id": "10000",
+                "PerihalPengumuman": "Penyampaian Laporan Tahunan & ",
+                "JMSXGroupID": "f-32117938-0",
+                "Divisi": "",
+                "KodeDivisi": "",
+                "JenisEmiten": null,
+                "EfekEmiten_Saham": true,
+                "EfekEmiten_Obligasi": false,
+                "EfekEmiten_EBA": false,
+                "EfekEmiten_ETF": false,
+                "EfekEmiten_SPEI": false
+            },
+            "attachments": [
+                {
+                    "Id": 0,
+                    "PDFFilename": "0071dd6a08_86d82f59e0.pdf",
+                    "FullSavePath": "https://www.idx.co.id/StaticData/NewsAndAnnouncement/ANNOUNCEMENTSTOCK/From_EREP/202608/0071dd6a08_86d82f59e0.pdf",
+                    "JMSXGroupID": null,
+                    "CorrelationID": null,
+                    "IsAttachment": false,
+                    "OriginalFilename": "ESG2025-PMJS.pdf"
+                },
+                {
+                    "Id": 0,
+                    "PDFFilename": "8f29c3e74e_0aea029451.pdf",
+                    "FullSavePath": "https://www.idx.co.id/StaticData/NewsAndAnnouncement/ANNOUNCEMENTSTOCK/From_EREP/202608/8f29c3e74e_0aea029451.pdf",
+                    "JMSXGroupID": null,
+                    "CorrelationID": null,
+                    "IsAttachment": true,
+                    "OriginalFilename": "AnnualReport2025-PMJS-att2.pdf"
+                },
+                {
+                    "Id": 0,
+                    "PDFFilename": "9df7f53547_0866aa6ab4.pdf",
+                    "FullSavePath": "https://www.idx.co.id/StaticData/NewsAndAnnouncement/ANNOUNCEMENTSTOCK/From_EREP/202608/9df7f53547_0866aa6ab4.pdf",
+                    "JMSXGroupID": null,
+                    "CorrelationID": null,
+                    "IsAttachment": true,
+                    "OriginalFilename": "AnnualReport2025-PMJS-att1.pdf"
+                }
+            ]
+        },
+        {
+            "pengumuman": {
+                "Id2": "20260805221718-050826/nav/xkiv_id-id",
+                "EfekEmiten_DIRE": false,
+                "EfekEmiten_DINFRA": false,
+                "Id": 0,
+                "FinalId": null,
+                "OldFinalId": 0,
+                "NoPengumuman": "050826/nav/xkiv",
+                "TglPengumuman": "2026-08-05T22:17:18",
+                "JudulPengumuman": "Laporan Harian atas Nilai Aktiva Bersih dan Komposisi Portofolio",
+                "JenisPengumuman": "STOCK",
+                "Kode_Emiten": "XKIV                                                                                                ",
+                "CreatedDate": "2026-08-05T22:30:02",
+                "Form_Id": "00010",
+                "PerihalPengumuman": "Laporan Harian atas Nilai Akti",
+                "JMSXGroupID": "f-32118195-0",
+                "Divisi": "",
+                "KodeDivisi": "",
+                "JenisEmiten": null,
+                "EfekEmiten_Saham": false,
+                "EfekEmiten_Obligasi": false,
+                "EfekEmiten_EBA": false,
+                "EfekEmiten_ETF": true,
+                "EfekEmiten_SPEI": false
+            },
+            "attachments": [
+                {
+                    "Id": 0,
+                    "PDFFilename": "b834899e5d_74ee887b1c.pdf",
+                    "FullSavePath": "https://www.idx.co.id/StaticData/NewsAndAnnouncement/ANNOUNCEMENTSTOCK/From_EREP/202608/b834899e5d_74ee887b1c.pdf",
+                    "JMSXGroupID": null,
+                    "CorrelationID": null,
+                    "IsAttachment": false,
+                    "OriginalFilename": "20260805_XKIV_Laporan Harian atas Nilai Aktiva Bersih dan Komposisi Portofolio_32118195.pdf"
+                },
+                {
+                    "Id": 0,
+                    "PDFFilename": "2be0809ee6_14d30f9444.xlsx",
+                    "FullSavePath": "https://www.idx.co.id/StaticData/NewsAndAnnouncement/ANNOUNCEMENTSTOCK/From_INAV/202608/2be0809ee6_14d30f9444.xlsx",
+                    "JMSXGroupID": null,
+                    "CorrelationID": null,
+                    "IsAttachment": true,
+                    "OriginalFilename": "20260805_XKIV_Laporan Harian atas Nilai Aktiva Bersih dan Komposisi Portofolio_32118195_lamp1.xlsx"
+                }
+            ]
+        },
+        {
+            "pengumuman": {
+                "Id2": "20260805221622-01981/FMS/OPS-BTIM/VIII/26_id-id",
+                "EfekEmiten_DIRE": false,
+                "EfekEmiten_DINFRA": false,
+                "Id": 0,
+                "FinalId": null,
+                "OldFinalId": 0,
+                "NoPengumuman": "01981/FMS/OPS-BTIM/VIII/26",
+                "TglPengumuman": "2026-08-05T22:16:22",
+                "JudulPengumuman": "Laporan Harian atas Nilai Aktiva Bersih dan Komposisi Portofolio",
+                "JenisPengumuman": "STOCK",
+                "Kode_Emiten": "R-ABFII                                                                                             ",
+                "CreatedDate": "2026-08-05T22:30:02",
+                "Form_Id": "00010",
+                "PerihalPengumuman": "Laporan Harian atas Nilai Akti",
+                "JMSXGroupID": "f-32118193-0",
+                "Divisi": "",
+                "KodeDivisi": "",
+                "JenisEmiten": null,
+                "EfekEmiten_Saham": false,
+                "EfekEmiten_Obligasi": false,
+                "EfekEmiten_EBA": false,
+                "EfekEmiten_ETF": true,
+                "EfekEmiten_SPEI": false
+            },
+            "attachments": [
+                {
+                    "Id": 0,
+                    "PDFFilename": "68afe10416_6bee3660a7.pdf",
+                    "FullSavePath": "https://www.idx.co.id/StaticData/NewsAndAnnouncement/ANNOUNCEMENTSTOCK/From_EREP/202608/68afe10416_6bee3660a7.pdf",
+                    "JMSXGroupID": null,
+                    "CorrelationID": null,
+                    "IsAttachment": false,
+                    "OriginalFilename": "20260805_R-ABFII_Laporan Harian atas Nilai Aktiva Bersih dan Komposisi Portofolio_32118193.pdf"
+                },
+                {
+                    "Id": 0,
+                    "PDFFilename": "2cff0c0432_2df5e2d1f6.pdf",
+                    "FullSavePath": "https://www.idx.co.id/StaticData/NewsAndAnnouncement/ANNOUNCEMENTSTOCK/From_EREP/202608/2cff0c0432_2df5e2d1f6.pdf",
+                    "JMSXGroupID": null,
+                    "CorrelationID": null,
+                    "IsAttachment": true,
+                    "OriginalFilename": "20260805_R-ABFII_Laporan Harian atas Nilai Aktiva Bersih dan Komposisi Portofolio_32118193_lamp2.pdf"
+                },
+                {
+                    "Id": 0,
+                    "PDFFilename": "62e65e2bc9_1ba059e76b.pdf",
+                    "FullSavePath": "https://www.idx.co.id/StaticData/NewsAndAnnouncement/ANNOUNCEMENTSTOCK/From_EREP/202608/62e65e2bc9_1ba059e76b.pdf",
+                    "JMSXGroupID": null,
+                    "CorrelationID": null,
+                    "IsAttachment": true,
+                    "OriginalFilename": "20260805_R-ABFII_Laporan Harian atas Nilai Aktiva Bersih dan Komposisi Portofolio_32118193_lamp1.pdf"
+                },
+                {
+                    "Id": 0,
+                    "PDFFilename": "86224811f3_1a7f5f981f.xlsx",
+                    "FullSavePath": "https://www.idx.co.id/StaticData/NewsAndAnnouncement/ANNOUNCEMENTSTOCK/From_INAV/202608/86224811f3_1a7f5f981f.xlsx",
+                    "JMSXGroupID": null,
+                    "CorrelationID": null,
+                    "IsAttachment": true,
+                    "OriginalFilename": "20260805_R-ABFII_Laporan Harian atas Nilai Aktiva Bersih dan Komposisi Portofolio_32118193_lamp3.xlsx"
+                }
+            ]
+        },
+        {
+            "pengumuman": {
+                "Id2": "20260805215257-4745./692/DCS/2026_id-id",
+                "EfekEmiten_DIRE": false,
+                "EfekEmiten_DINFRA": false,
+                "Id": 0,
+                "FinalId": null,
+                "OldFinalId": 0,
+                "NoPengumuman": "4745./692/DCS/2026",
+                "TglPengumuman": "2026-08-05T21:52:57",
+                "JudulPengumuman": "Penyampaian Ringkasan Perubahan Anggaran Dasar (KOREKSI)",
+                "JenisPengumuman": "STOCK",
+                "Kode_Emiten": "ANTM                                                                                                ",
+                "CreatedDate": "2026-08-05T22:00:02",
+                "Form_Id": "11000",
+                "PerihalPengumuman": "Penyampaian Ringkasan Perubaha",
+                "JMSXGroupID": "f-32118189-0",
+                "Divisi": "",
+                "KodeDivisi": "",
+                "JenisEmiten": null,
+                "EfekEmiten_Saham": true,
+                "EfekEmiten_Obligasi": true,
+                "EfekEmiten_EBA": false,
+                "EfekEmiten_ETF": false,
+                "EfekEmiten_SPEI": false
+            },
+            "attachments": [
+                {
+                    "Id": 0,
+                    "PDFFilename": "5324d5da5b_a38e0edd10.pdf",
+                    "FullSavePath": "https://www.idx.co.id/StaticData/NewsAndAnnouncement/ANNOUNCEMENTSTOCK/From_EREP/202608/5324d5da5b_a38e0edd10.pdf",
+                    "JMSXGroupID": null,
+                    "CorrelationID": null,
+                    "IsAttachment": false,
+                    "OriginalFilename": "20260805_ANTM_Laporan Informasi dan Fakta Material_32118189.pdf"
+                },
+                {
+                    "Id": 0,
+                    "PDFFilename": "02eab8ae8d_7d61eaefe4.pdf",
+                    "FullSavePath": "https://www.idx.co.id/StaticData/NewsAndAnnouncement/ANNOUNCEMENTSTOCK/From_EREP/202608/02eab8ae8d_7d61eaefe4.pdf",
+                    "JMSXGroupID": null,
+                    "CorrelationID": null,
+                    "IsAttachment": true,
+                    "OriginalFilename": "20260805_ANTM_Laporan Informasi dan Fakta Material_32118189_lamp3.pdf"
+                },
+                {
+                    "Id": 0,
+                    "PDFFilename": "22643b4b41_2b22c21769.pdf",
+                    "FullSavePath": "https://www.idx.co.id/StaticData/NewsAndAnnouncement/ANNOUNCEMENTSTOCK/From_EREP/202608/22643b4b41_2b22c21769.pdf",
+                    "JMSXGroupID": null,
+                    "CorrelationID": null,
+                    "IsAttachment": true,
+                    "OriginalFilename": "20260805_ANTM_Laporan Informasi dan Fakta Material_32118189_lamp1.pdf"
+                },
+                {
+                    "Id": 0,
+                    "PDFFilename": "9a4b242a5f_3027cb6eea.pdf",
+                    "FullSavePath": "https://www.idx.co.id/StaticData/NewsAndAnnouncement/ANNOUNCEMENTSTOCK/From_EREP/202608/9a4b242a5f_3027cb6eea.pdf",
+                    "JMSXGroupID": null,
+                    "CorrelationID": null,
+                    "IsAttachment": true,
+                    "OriginalFilename": "20260805_ANTM_Laporan Informasi dan Fakta Material_32118189_lamp2.pdf"
+                }
+            ]
+        },
+        {
+            "pengumuman": {
+                "Id2": "20260805215110-4745/692/DCS/2026_id-id",
+                "EfekEmiten_DIRE": false,
+                "EfekEmiten_DINFRA": false,
+                "Id": 0,
+                "FinalId": null,
+                "OldFinalId": 0,
+                "NoPengumuman": "4745/692/DCS/2026",
+                "TglPengumuman": "2026-08-05T21:51:10",
+                "JudulPengumuman": "Penyampaian Ringkasan Perubahan Anggaran Dasar",
+                "JenisPengumuman": "STOCK",
+                "Kode_Emiten": "ANTM                                                                                                ",
+                "CreatedDate": "2026-08-05T22:00:02",
+                "Form_Id": "11000",
+                "PerihalPengumuman": "Penyampaian Ringkasan Perubaha",
+                "JMSXGroupID": "f-32118188-0",
+                "Divisi": "",
+                "KodeDivisi": "",
+                "JenisEmiten": null,
+                "EfekEmiten_Saham": true,
+                "EfekEmiten_Obligasi": true,
+                "EfekEmiten_EBA": false,
+                "EfekEmiten_ETF": false,
+                "EfekEmiten_SPEI": false
+            },
+            "attachments": [
+                {
+                    "Id": 0,
+                    "PDFFilename": "662f24b7a9_4b1727a06c.pdf",
+                    "FullSavePath": "https://www.idx.co.id/StaticData/NewsAndAnnouncement/ANNOUNCEMENTSTOCK/From_EREP/202608/662f24b7a9_4b1727a06c.pdf",
+                    "JMSXGroupID": null,
+                    "CorrelationID": null,
+                    "IsAttachment": false,
+                    "OriginalFilename": "20260805_ANTM_Laporan Informasi dan Fakta Material_32118188.pdf"
+                },
+                {
+                    "Id": 0,
+                    "PDFFilename": "35548236c1_18336a6c29.pdf",
+                    "FullSavePath": "https://www.idx.co.id/StaticData/NewsAndAnnouncement/ANNOUNCEMENTSTOCK/From_EREP/202608/35548236c1_18336a6c29.pdf",
+                    "JMSXGroupID": null,
+                    "CorrelationID": null,
+                    "IsAttachment": true,
+                    "OriginalFilename": "20260805_ANTM_Laporan Informasi dan Fakta Material_32118188_lamp1.pdf"
+                },
+                {
+                    "Id": 0,
+                    "PDFFilename": "508aa894a3_9a516dc33e.pdf",
+                    "FullSavePath": "https://www.idx.co.id/StaticData/NewsAndAnnouncement/ANNOUNCEMENTSTOCK/From_EREP/202608/508aa894a3_9a516dc33e.pdf",
+                    "JMSXGroupID": null,
+                    "CorrelationID": null,
+                    "IsAttachment": true,
+                    "OriginalFilename": "20260805_ANTM_Laporan Informasi dan Fakta Material_32118188_lamp2.pdf"
+                }
+            ]
+        },
+        {
+            "pengumuman": {
+                "Id2": "20260805215011-01980/FMS/OPS-BTIM/VIII/26_id-id",
+                "EfekEmiten_DIRE": false,
+                "EfekEmiten_DINFRA": false,
+                "Id": 0,
+                "FinalId": null,
+                "OldFinalId": 0,
+                "NoPengumuman": "01980/FMS/OPS-BTIM/VIII/26",
+                "TglPengumuman": "2026-08-05T21:50:11",
+                "JudulPengumuman": "Laporan Harian atas Nilai Aktiva Bersih dan Komposisi Portofolio",
+                "JenisPengumuman": "STOCK",
+                "Kode_Emiten": "XPIN                                                                                                ",
+                "CreatedDate": "2026-08-05T22:00:02",
+                "Form_Id": "00010",
+                "PerihalPengumuman": "Laporan Harian atas Nilai Akti",
+                "JMSXGroupID": "f-32118175-0",
+                "Divisi": "",
+                "KodeDivisi": "",
+                "JenisEmiten": null,
+                "EfekEmiten_Saham": false,
+                "EfekEmiten_Obligasi": false,
+                "EfekEmiten_EBA": false,
+                "EfekEmiten_ETF": true,
+                "EfekEmiten_SPEI": false
+            },
+            "attachments": [
+                {
+                    "Id": 0,
+                    "PDFFilename": "3c513709f7_ecd6134a84.pdf",
+                    "FullSavePath": "https://www.idx.co.id/StaticData/NewsAndAnnouncement/ANNOUNCEMENTSTOCK/From_EREP/202608/3c513709f7_ecd6134a84.pdf",
+                    "JMSXGroupID": null,
+                    "CorrelationID": null,
+                    "IsAttachment": false,
+                    "OriginalFilename": "20260805_XPIN_Laporan Harian atas Nilai Aktiva Bersih dan Komposisi Portofolio_32118175.pdf"
+                },
+                {
+                    "Id": 0,
+                    "PDFFilename": "11431f574a_a650d0614b.xlsx",
+                    "FullSavePath": "https://www.idx.co.id/StaticData/NewsAndAnnouncement/ANNOUNCEMENTSTOCK/From_INAV/202608/11431f574a_a650d0614b.xlsx",
+                    "JMSXGroupID": null,
+                    "CorrelationID": null,
+                    "IsAttachment": true,
+                    "OriginalFilename": "20260805_XPIN_Laporan Harian atas Nilai Aktiva Bersih dan Komposisi Portofolio_32118175_lamp3.xlsx"
+                },
+                {
+                    "Id": 0,
+                    "PDFFilename": "16d8e5626e_31c86031b7.pdf",
+                    "FullSavePath": "https://www.idx.co.id/StaticData/NewsAndAnnouncement/ANNOUNCEMENTSTOCK/From_EREP/202608/16d8e5626e_31c86031b7.pdf",
+                    "JMSXGroupID": null,
+                    "CorrelationID": null,
+                    "IsAttachment": true,
+                    "OriginalFilename": "20260805_XPIN_Laporan Harian atas Nilai Aktiva Bersih dan Komposisi Portofolio_32118175_lamp1.pdf"
+                },
+                {
+                    "Id": 0,
+                    "PDFFilename": "d48d06abf7_69833ffc26.pdf",
+                    "FullSavePath": "https://www.idx.co.id/StaticData/NewsAndAnnouncement/ANNOUNCEMENTSTOCK/From_EREP/202608/d48d06abf7_69833ffc26.pdf",
+                    "JMSXGroupID": null,
+                    "CorrelationID": null,
+                    "IsAttachment": true,
+                    "OriginalFilename": "20260805_XPIN_Laporan Harian atas Nilai Aktiva Bersih dan Komposisi Portofolio_32118175_lamp2.pdf"
+                }
+            ]
+        },
+        {
+            "pengumuman": {
+                "Id2": "20260805214944-01978/FMS/OPS-BTIM/VIII/26_id-id",
+                "EfekEmiten_DIRE": false,
+                "EfekEmiten_DINFRA": false,
+                "Id": 0,
+                "FinalId": null,
+                "OldFinalId": 0,
+                "NoPengumuman": "01978/FMS/OPS-BTIM/VIII/26",
+                "TglPengumuman": "2026-08-05T21:49:44",
+                "JudulPengumuman": "Laporan Harian atas Nilai Aktiva Bersih dan Komposisi Portofolio",
+                "JenisPengumuman": "STOCK",
+                "Kode_Emiten": "XBIN                                                                                                ",
+                "CreatedDate": "2026-08-05T22:00:02",
+                "Form_Id": "00010",
+                "PerihalPengumuman": "Laporan Harian atas Nilai Akti",
+                "JMSXGroupID": "f-32118143-0",
+                "Divisi": "",
+                "KodeDivisi": "",
+                "JenisEmiten": null,
+                "EfekEmiten_Saham": false,
+                "EfekEmiten_Obligasi": false,
+                "EfekEmiten_EBA": false,
+                "EfekEmiten_ETF": true,
+                "EfekEmiten_SPEI": false
+            },
+            "attachments": [
+                {
+                    "Id": 0,
+                    "PDFFilename": "21978fb3f8_3edd5faf31.pdf",
+                    "FullSavePath": "https://www.idx.co.id/StaticData/NewsAndAnnouncement/ANNOUNCEMENTSTOCK/From_EREP/202608/21978fb3f8_3edd5faf31.pdf",
+                    "JMSXGroupID": null,
+                    "CorrelationID": null,
+                    "IsAttachment": false,
+                    "OriginalFilename": "20260805_XBIN_Laporan Harian atas Nilai Aktiva Bersih dan Komposisi Portofolio_32118143.pdf"
+                },
+                {
+                    "Id": 0,
+                    "PDFFilename": "319d6070bb_8c73d5f93e.xlsx",
+                    "FullSavePath": "https://www.idx.co.id/StaticData/NewsAndAnnouncement/ANNOUNCEMENTSTOCK/From_INAV/202608/319d6070bb_8c73d5f93e.xlsx",
+                    "JMSXGroupID": null,
+                    "CorrelationID": null,
+                    "IsAttachment": true,
+                    "OriginalFilename": "20260805_XBIN_Laporan Harian atas Nilai Aktiva Bersih dan Komposisi Portofolio_32118143_lamp3.xlsx"
+                },
+                {
+                    "Id": 0,
+                    "PDFFilename": "87d78cb0d7_0517fbcb85.pdf",
+                    "FullSavePath": "https://www.idx.co.id/StaticData/NewsAndAnnouncement/ANNOUNCEMENTSTOCK/From_EREP/202608/87d78cb0d7_0517fbcb85.pdf",
+                    "JMSXGroupID": null,
+                    "CorrelationID": null,
+                    "IsAttachment": true,
+                    "OriginalFilename": "20260805_XBIN_Laporan Harian atas Nilai Aktiva Bersih dan Komposisi Portofolio_32118143_lamp1.pdf"
+                },
+                {
+                    "Id": 0,
+                    "PDFFilename": "f5e8d0cfec_44e88af4a2.pdf",
+                    "FullSavePath": "https://www.idx.co.id/StaticData/NewsAndAnnouncement/ANNOUNCEMENTSTOCK/From_EREP/202608/f5e8d0cfec_44e88af4a2.pdf",
+                    "JMSXGroupID": null,
+                    "CorrelationID": null,
+                    "IsAttachment": true,
+                    "OriginalFilename": "20260805_XBIN_Laporan Harian atas Nilai Aktiva Bersih dan Komposisi Portofolio_32118143_lamp2.pdf"
+                }
+            ]
+        }
+    ]
+}

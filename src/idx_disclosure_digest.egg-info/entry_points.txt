@@ -1,0 +1,2 @@
+[console_scripts]
+idx-digest = idx_digest.cli:app

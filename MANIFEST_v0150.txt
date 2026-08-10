@@ -1,0 +1,18 @@
+IDX Disclosure Digest v0.15.0
+
+Major additions:
+- Incremental company input fingerprints and cache reuse
+- Dirty-company reducer scope and pre-scheduler no-evidence skip
+- Single-announcement deterministic company promotion
+- IDX pagination completeness guard + date/ticker sharding fallback
+- Stock-master cache/allowlist guardrails
+- Network connectivity watchdog
+- Public Expose / investor-presentation specialist document prompt
+- Financial XLSX primary-sheet ranking + formula fallback
+- Auditable routine ownership percentage deltas
+- Progressive company summaries in GUI
+- Phase-aware company ETA and company cache counters
+- Active-run vs next-run configuration separation
+- Concurrency presets and warnings
+
+Generation-token ceilings unchanged from v0.14.4.

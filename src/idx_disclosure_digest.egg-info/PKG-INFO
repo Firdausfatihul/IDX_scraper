@@ -1,0 +1,24 @@
+Metadata-Version: 2.4
+Name: idx-disclosure-digest
+Version: 0.15.5
+Summary: IDX disclosure scraper, document extractor, and per-company summarizer
+Requires-Python: >=3.11
+Requires-Dist: httpx[http2]<1,>=0.27
+Requires-Dist: tenacity<10,>=9
+Requires-Dist: typer<1,>=0.12
+Requires-Dist: pydantic<3,>=2.8
+Requires-Dist: pydantic-settings<3,>=2.4
+Requires-Dist: python-dateutil<3,>=2.9
+Requires-Dist: PyMuPDF<2,>=1.24
+Requires-Dist: Pillow<12,>=10
+Requires-Dist: pytesseract<1,>=0.3.13
+Requires-Dist: openpyxl<4,>=3.1
+Requires-Dist: python-docx<2,>=1.1
+Requires-Dist: beautifulsoup4<5,>=4.12
+Requires-Dist: playwright<2,>=1.50
+Requires-Dist: rich<16,>=13.8
+Requires-Dist: fastapi<1,>=0.115
+Requires-Dist: uvicorn<1,>=0.30
+Provides-Extra: dev
+Requires-Dist: pytest<9,>=8; extra == "dev"
+Requires-Dist: ruff<1,>=0.6; extra == "dev"

@@ -1,0 +1,16 @@
+.env
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+data/raw/
+data/text/
+data/companies/
+data/idx_digest.sqlite3
+
+data/browser-profile/
+playwright/.auth/data/logs/
+data/traces/
+data/last_run.json
+.DS_Store
+data/

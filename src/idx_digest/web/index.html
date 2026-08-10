@@ -1,0 +1,1328 @@
+<!doctype html>
+<html lang="en" data-theme="paper">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>IDX Signal Desk · Disclosure Intelligence Archive</title>
+  <style>
+    :root {
+      --paper:#fbfaf3; --paper-2:#f2efe4; --ink:#000066; --ink-2:#222252; --link:#5a1478;
+      --visited:#9a1c1c; --rule:#7b7b98; --rule-soft:#d7d3c7; --muted:#66667e; --green:#146b47;
+      --amber:#8a5a00; --red:#9b2323; --white:#fffef8; --shadow:0 12px 30px rgba(38,38,62,.09);
+      --sans:Arial,Helvetica,sans-serif; --serif:Georgia,"Times New Roman",serif; --mono:"SFMono-Regular",Consolas,"Liberation Mono",monospace;
+    }
+    html[data-theme="midnight"] {
+      --paper:#11131c; --paper-2:#181b27; --ink:#d9dcff; --ink-2:#f1f0ff; --link:#d5a1ff;
+      --visited:#ff9595; --rule:#757898; --rule-soft:#34384b; --muted:#a2a5bd; --green:#77d5a8;
+      --amber:#eac16c; --red:#ff8f8f; --white:#151824; --shadow:0 12px 30px rgba(0,0,0,.24);
+    }
+    *{box-sizing:border-box} html{scroll-behavior:smooth} body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:14px;line-height:1.45}
+    button,input,select,textarea{font:inherit;color:inherit} button{cursor:pointer} a{color:var(--link)} a:visited{color:var(--visited)}
+    .shell{max-width:1500px;margin:0 auto;padding:18px 24px 36px}.masthead{text-align:center;padding:6px 0 10px}.masthead h1{margin:0;font-family:var(--serif);font-size:29px;letter-spacing:.02em}.masthead h1 .cap{font-size:1.42em;line-height:.8}.masthead .address{font-family:var(--serif);font-size:12px;margin-top:3px}.masthead .subtitle{font-family:var(--serif);font-weight:700;margin-top:3px}.rule{border:0;border-top:1px solid var(--rule);margin:8px 0}
+    .utility{display:grid;grid-template-columns:minmax(280px,1fr) auto auto;gap:12px;align-items:center;padding:6px 0}.profile-tools,.server-tools{display:flex;align-items:center;gap:7px;flex-wrap:wrap}.server-tools{justify-content:flex-end}.profile-label{font:700 10px/1 var(--sans);text-transform:uppercase;letter-spacing:.09em;color:var(--muted)}
+    select,input[type="text"],input[type="number"],input[type="datetime-local"],textarea{background:var(--white);border:1px solid var(--rule-soft);border-radius:3px;padding:8px 9px;outline:none} select:focus,input:focus,textarea:focus{border-color:var(--ink);box-shadow:0 0 0 2px color-mix(in srgb,var(--ink) 10%,transparent)}
+    .profile-select{min-width:190px;height:34px}.autosave{font:11px var(--mono);color:var(--muted)}.autosave.saving{color:var(--amber)}.autosave.saved{color:var(--green)}
+    .status-pill,.model-pill{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--rule-soft);padding:5px 8px;background:var(--white);font-size:11px;white-space:nowrap}.dot{width:7px;height:7px;border-radius:50%;background:var(--muted)}.dot.ready,.dot.completed{background:var(--green)}.dot.running{background:#3454a4;animation:pulse 1.2s infinite}.dot.failed{background:var(--red)}@keyframes pulse{50%{opacity:.35}}
+    .text-btn,.secondary,.primary,.danger-btn,.prompt-btn,.share-btn,.audit-btn,.link-btn,.nav-btn,.icon-btn{border:1px solid var(--rule);background:var(--white);color:var(--link);padding:7px 10px;border-radius:3px;text-decoration:none;font-size:12px;font-weight:700}.text-btn:hover,.secondary:hover,.prompt-btn:hover,.share-btn:hover,.audit-btn:hover,.nav-btn:hover,.link-btn:hover{background:var(--paper-2)}.primary{background:var(--ink);color:var(--paper);border-color:var(--ink)}.danger-btn{color:var(--red);border-color:color-mix(in srgb,var(--red) 55%,var(--rule-soft))}.icon-btn{width:34px;height:34px;padding:0;font-size:19px}.primary:disabled,.secondary:disabled,.audit-btn:disabled{opacity:.45;cursor:not-allowed}
+    .nav{display:flex;justify-content:center;gap:4px;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);padding:5px 0;margin:3px 0 15px}.nav-btn{border:0;background:transparent;color:var(--link);padding:7px 18px}.nav-btn.active{color:var(--ink);text-decoration:underline;text-underline-offset:5px;text-decoration-thickness:2px}
+    .workspace-view{display:none}.workspace-view.active{display:block}.desk-grid{display:grid;grid-template-columns:330px minmax(0,1fr);gap:20px;align-items:start}.left-rail{display:grid;gap:14px;position:sticky;top:10px}.main-stack{display:grid;gap:14px;min-width:0}
+    .panel{background:var(--white);border:1px solid var(--rule);box-shadow:var(--shadow)}.panel-head{padding:10px 12px;border-bottom:1px solid var(--rule-soft);background:color-mix(in srgb,var(--paper-2) 55%,var(--white))}.panel-head h2,.panel-head h3{font:700 15px var(--serif);margin:0}.panel-head p{margin:3px 0 0;color:var(--muted);font-size:11px}.panel-body{padding:12px}
+    .field{display:grid;gap:4px;margin-bottom:10px}.field-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}label{font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:700}.field input,.field select{width:100%;min-height:36px}.range-line{display:flex;align-items:center;gap:8px}.range-line input{flex:1}.range-value{font:11px var(--mono);min-width:28px;text-align:center}
+    .switch-row{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-top:1px dotted var(--rule-soft)}.switch-copy strong{font-size:12px}.switch-copy span{display:block;color:var(--muted);font-size:10px;margin-top:2px}.switch{position:relative;width:36px;height:20px;flex:0 0 auto}.switch input{opacity:0;position:absolute}.slider{position:absolute;inset:0;border:1px solid var(--rule);background:var(--paper-2)}.slider:before{content:"";position:absolute;width:14px;height:14px;top:2px;left:2px;background:var(--muted);transition:.15s}.switch input:checked+.slider:before{left:18px;background:var(--ink)}
+    .run-actions{display:grid;gap:6px;margin-top:8px}.run-actions .primary,.run-actions .secondary{width:100%}.hint{font-size:10px;color:var(--muted);margin-top:8px}.preset-row{display:flex;gap:5px;flex-wrap:wrap;margin:4px 0 9px}.preset-row button{flex:1 1 88px;padding:5px 7px;font-size:10px}.config-warning{display:none;border:1px solid color-mix(in srgb,var(--amber) 50%,var(--rule-soft));background:color-mix(in srgb,var(--amber) 8%,var(--white));padding:7px 8px;font-size:10px;color:var(--amber);margin:-2px 0 8px}.config-warning.show{display:block}.active-run-strip{display:none;padding:9px 12px;border-bottom:1px double var(--rule);background:color-mix(in srgb,var(--paper-2) 55%,var(--white));font-size:10px}.active-run-strip.show{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}.active-run-strip strong{font:700 12px var(--serif)}.active-run-meta{display:flex;gap:10px;flex-wrap:wrap;color:var(--muted);font-family:var(--mono)}.network-state{font-weight:700}.network-state.offline{color:var(--red)}.network-state.online{color:var(--green)}.network-state.throttled{color:var(--amber)}.config-list{display:grid;gap:6px}.config-item{display:flex;justify-content:space-between;gap:12px;font-size:11px;border-bottom:1px dotted var(--rule-soft);padding-bottom:5px}.config-item span:first-child{color:var(--muted)}.config-item span:last-child{text-align:right;max-width:190px;overflow:hidden;text-overflow:ellipsis}
+    .hero{display:grid;grid-template-columns:1fr auto;gap:20px;padding:16px 18px;border-top:3px double var(--rule)}.hero h2{font:700 25px var(--serif);margin:0}.hero p{margin:6px 0 0;color:var(--ink-2);max-width:820px}.hero-state{text-align:right}.elapsed{font:26px var(--mono)}.elapsed-label{font-size:10px;color:var(--muted)}
+    .metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.metric{padding:10px 12px;box-shadow:none}.metric-label{font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}.metric-value{font:700 22px var(--serif);margin-top:3px}.metric-note{font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .observatory{box-shadow:none}.observatory-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:0}.obs-card{padding:10px 11px;border-right:1px dotted var(--rule-soft);min-width:0}.obs-card:last-child{border-right:0}.obs-label{font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}.obs-value{font:700 17px var(--serif);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.obs-note{font:9px var(--mono);color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.mini-bar{height:3px;background:var(--paper-2);margin-top:6px;overflow:hidden}.mini-bar i{display:block;height:100%;width:0;background:var(--ink);transition:width .18s}.advisor-row{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:9px 11px;border-top:1px solid var(--rule-soft);background:color-mix(in srgb,var(--paper-2) 45%,var(--white))}.advisor-copy{min-width:0}.advisor-copy strong{font:700 13px var(--serif)}.advisor-copy span{display:block;font-size:10px;color:var(--muted);margin-top:2px}.advisor-copy code{font:10px var(--mono)}
+    .work-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.section-title{display:flex;justify-content:space-between;align-items:center;padding:9px 11px;border-bottom:1px solid var(--rule-soft)}.section-title h3{margin:0;font:700 14px var(--serif)}.section-title span{font-size:10px;color:var(--muted)}.tasks{padding:8px;min-height:170px}.task{padding:8px;border-bottom:1px dotted var(--rule-soft)}.task-top{display:flex;justify-content:space-between;gap:8px;font-size:11px}.task-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.task-count{font-family:var(--mono);color:var(--muted)}.bar{height:4px;background:var(--paper-2);margin-top:6px;overflow:hidden}.bar i{height:100%;display:block;background:var(--ink)}.bar.indeterminate i{width:32%;animation:slide 1.15s infinite}@keyframes slide{from{transform:translateX(-120%)}to{transform:translateX(330%)}}
+    .ledger-summary{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:7px 8px 9px;border-bottom:1px double var(--rule);font-size:10px;color:var(--muted)}.ledger-summary strong{font:700 12px var(--serif);color:var(--ink)}
+    .chunk-doc-card{padding:9px 8px;border-bottom:1px double var(--rule);background:color-mix(in srgb,var(--paper-2) 58%,var(--white));min-width:0}.chunk-doc-head{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}.chunk-doc-title{min-width:0}.chunk-doc-title strong{display:block;font:700 11px var(--serif);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.chunk-doc-title span{display:block;margin-top:1px;font-size:9px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.chunk-doc-state{flex:0 0 auto;border:1px solid var(--rule);padding:2px 5px;font:8px var(--mono);text-transform:uppercase;color:var(--link)}.chunk-doc-meta{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:3px 9px;margin-top:6px;font:9px var(--mono);color:var(--muted)}.chunk-doc-meta span{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.chunk-warning{color:var(--amber);font-weight:700}.chunk-retry{color:var(--red);font-weight:700}.bar.chunk-exact i{transition:width .25s ease}.bar.chunk-combine i{width:98%;animation:slide 1.15s infinite}
+    .llm-request-card{padding:9px 8px;border-bottom:1px dotted var(--rule-soft);background:color-mix(in srgb,var(--white) 70%,transparent)}.llm-request-head{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}.llm-request-title{min-width:0}.llm-request-title strong{display:block;font:700 11px var(--serif);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.llm-request-title span{display:block;font-size:9px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}.llm-state{flex:0 0 auto;border:1px solid var(--rule-soft);padding:2px 5px;font:8px var(--mono);text-transform:uppercase;letter-spacing:.05em;color:var(--link)}.llm-request-meta{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:3px 9px;margin-top:6px;font:9px var(--mono);color:var(--muted)}.llm-request-meta span{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.llm-progress-line{display:flex;justify-content:space-between;gap:8px;align-items:center;margin-top:6px;font-size:9px;color:var(--muted)}.llm-progress-line strong{color:var(--ink);font-family:var(--mono);font-weight:700}.llm-estimate{font-style:italic}.bar.estimated i{transition:width .8s ease}.bar.waiting i{width:22%;animation:slide 1.15s infinite}.bar.validating i{width:98%}.bar.response i{width:96%}
+
+    .timeline{height:250px;overflow:auto;padding:4px 9px}.log{display:grid;grid-template-columns:64px 8px 1fr;gap:6px;padding:6px 0;border-bottom:1px dotted var(--rule-soft);font-size:10px}.log time{font-family:var(--mono);color:var(--muted)}.log-dot{width:5px;height:5px;background:var(--rule);border-radius:50%;margin-top:5px}.log.warning .log-dot{background:var(--amber)}.log.error .log-dot{background:var(--red)}.log-stage{font-weight:700;margin-right:5px;text-transform:uppercase;font-size:9px}
+    .empty{min-height:110px;display:grid;place-items:center;text-align:center;color:var(--muted);padding:20px}.result-head{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:9px 11px;border-bottom:1px solid var(--rule-soft)}.result-head h3{margin:0;font:700 16px var(--serif)}.result-actions{display:flex;gap:5px;flex-wrap:wrap;align-items:center}.tabs{display:flex;gap:1px;overflow:auto;border-bottom:1px solid var(--rule-soft);padding:4px 6px}.tab{border:0;background:transparent;color:var(--link);font-size:11px;padding:7px 9px;white-space:nowrap}.tab.active{font-weight:700;text-decoration:underline;text-underline-offset:4px}.ticker-tabs{background:color-mix(in srgb,var(--paper-2) 55%,transparent)}.result-body{padding:14px;min-height:180px}.overview{font:16px/1.6 var(--serif);max-width:1000px}.result-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.result-card{border:1px solid var(--rule-soft);padding:10px;background:var(--paper)}.result-card strong{font-family:var(--serif)}.result-card p{margin:3px 0;color:var(--ink-2);font-size:11px}.chips{display:grid;gap:7px}.chip{border-bottom:1px dotted var(--rule-soft);padding:5px 0}.slow-list{display:grid;gap:7px}.slow-row{display:grid;grid-template-columns:1fr 70px;gap:10px}.slow-name{font-size:10px}.slow-time{font:10px var(--mono);text-align:right}
+    pre{white-space:pre-wrap;word-break:break-word;background:var(--paper);border:1px solid var(--rule-soft);padding:10px;font:10px/1.55 var(--mono);color:var(--ink-2);max-height:520px;overflow:auto}
+    .library-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.library-hero{display:flex;justify-content:space-between;gap:12px;align-items:flex-end;margin-bottom:12px}.library-hero h2{font:700 25px var(--serif);margin:0}.library-hero p{color:var(--muted);margin:4px 0 0}.ledger{width:100%;border-collapse:collapse;font-size:11px}.ledger th{text-align:left;font-family:var(--serif);border-bottom:2px double var(--rule);padding:7px 6px}.ledger td{border-bottom:1px dotted var(--rule-soft);padding:8px 6px;vertical-align:top}.ledger tr[data-open-window],.ledger tr[data-open-run]{cursor:pointer}.ledger tr:hover td{background:var(--paper-2)}.badge{display:inline-block;border:1px solid var(--rule-soft);padding:2px 5px;font:9px var(--mono);margin:1px}.badge.good{color:var(--green)}.badge.warn{color:var(--amber)}.badge.bad{color:var(--red)}.statline{display:flex;gap:16px;flex-wrap:wrap;font-size:11px;color:var(--muted);margin:6px 0 12px}.statline b{color:var(--ink);font-family:var(--serif);font-size:15px}
+    .company-toolbar{display:flex;gap:8px;align-items:center;margin-bottom:10px}.company-toolbar input{max-width:300px}.company-index{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.company-card{border:1px solid var(--rule-soft);background:var(--white);padding:10px;text-align:left}.company-card:hover{border-color:var(--ink)}.company-card strong{font:700 18px var(--serif)}.company-card p{font-size:10px;color:var(--muted);margin:4px 0}.company-card .overview-mini{color:var(--ink-2);font-size:11px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+    .activity-grid{display:grid;grid-template-columns:300px 1fr;gap:14px}.activity-list{max-height:650px;overflow:auto}.activity-run{display:block;width:100%;text-align:left;border:0;border-bottom:1px dotted var(--rule-soft);background:transparent;padding:9px;color:var(--link)}.activity-run.active{background:var(--paper-2);color:var(--ink)}.activity-meta{font-size:11px;color:var(--muted);padding:10px;border-bottom:1px solid var(--rule-soft)}.activity-timeline{max-height:610px;overflow:auto;padding:6px 10px}.activity-event{display:grid;grid-template-columns:72px 90px 1fr;gap:8px;border-bottom:1px dotted var(--rule-soft);padding:6px 0;font-size:10px}.activity-event time,.activity-event .stage{font-family:var(--mono);color:var(--muted)}
+    .footer-note{font-size:10px;color:var(--muted);text-align:center;margin-top:18px;border-top:1px solid var(--rule);padding-top:9px}.footer-note strong{color:var(--ink)}
+    .toast{position:fixed;right:20px;bottom:20px;max-width:380px;padding:10px 12px;background:var(--ink);color:var(--paper);border:1px solid var(--rule);box-shadow:var(--shadow);font-size:12px;opacity:0;transform:translateY(10px);pointer-events:none;transition:.18s;z-index:100}.toast.show{opacity:1;transform:none}.toast.error{background:var(--red)}
+    .modal-shell{position:fixed;inset:0;background:rgba(20,20,36,.48);display:none;place-items:center;padding:18px;z-index:50}.modal-shell.open{display:grid}.modal{width:min(1100px,96vw);max-height:92vh;background:var(--white);border:1px solid var(--rule);box-shadow:0 24px 80px rgba(0,0,0,.25);display:grid;grid-template-rows:auto minmax(0,1fr) auto}.modal-head,.modal-foot{padding:11px 13px;display:flex;justify-content:space-between;gap:12px;align-items:center;border-bottom:1px solid var(--rule)}.modal-foot{border-top:1px solid var(--rule);border-bottom:0}.modal-head h2{font:700 18px var(--serif);margin:0}.modal-head p,.modal-note{font-size:10px;color:var(--muted);margin:2px 0 0}.modal-body{min-height:0;display:grid;grid-template-columns:220px 1fr}.prompt-nav{border-right:1px solid var(--rule-soft);padding:8px;overflow:auto}.prompt-tab{display:block;width:100%;text-align:left;border:0;background:transparent;color:var(--link);padding:8px}.prompt-tab.active{background:var(--paper-2);color:var(--ink);font-weight:700}.prompt-editor{padding:12px;display:grid;grid-template-rows:auto auto minmax(300px,1fr);gap:9px;min-width:0}.prompt-meta{display:flex;justify-content:space-between;gap:12px}.prompt-meta h3{font:700 15px var(--serif);margin:0}.prompt-stats{font:10px var(--mono);color:var(--muted)}.profile-field{display:flex;gap:6px;align-items:center}.profile-field input{height:32px}.variables{display:flex;gap:4px;flex-wrap:wrap;font-size:9px;color:var(--muted)}.variable{border:1px solid var(--rule-soft);padding:2px 4px;font-family:var(--mono)}#promptText{width:100%;height:100%;min-height:330px;resize:none;font:11px/1.5 var(--mono)}.button-row{display:flex;gap:5px;flex-wrap:wrap}
+    .share-modal{width:min(780px,96vw)}.share-body{padding:12px;overflow:auto}.share-scope,.share-status{padding:8px;border:1px solid var(--rule-soft);background:var(--paper);font-size:11px;margin-bottom:10px}.share-presets{display:flex;gap:5px;margin-bottom:10px}.share-preset{border:1px solid var(--rule-soft);background:var(--white);color:var(--link);padding:6px 8px}.share-preset.active{background:var(--paper-2);color:var(--ink);font-weight:700}.share-sections{display:grid;grid-template-columns:repeat(2,1fr);gap:5px}.share-check{display:flex;gap:6px;align-items:center;text-transform:none;letter-spacing:0;color:var(--ink);font-size:11px}
+    .audit-modal{width:min(1250px,97vw);height:min(900px,94vh);grid-template-rows:auto auto minmax(0,1fr)}.audit-tabs{display:flex;gap:2px;padding:5px;border-bottom:1px solid var(--rule);overflow:auto}.audit-body{padding:12px;overflow:auto}.audit-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.audit-card{border:1px solid var(--rule-soft);background:var(--paper);padding:9px}.audit-card h4{font:700 14px var(--serif);margin:0 0 5px}.audit-card p{font-size:10px;margin:4px 0;color:var(--ink-2)}.audit-meta{display:flex;gap:4px;flex-wrap:wrap}.audit-badge{border:1px solid var(--rule-soft);padding:2px 4px;font:9px var(--mono);color:var(--muted)}.audit-badge.exact{color:var(--green)}.audit-badge.inferred{color:var(--amber)}.audit-step{display:grid;grid-template-columns:175px 1fr auto;gap:8px;padding:7px;border-bottom:1px dotted var(--rule-soft)}.audit-step time{font:9px var(--mono);color:var(--muted)}.audit-step strong{display:block;font-size:11px}.audit-step span{font-size:10px;color:var(--muted)}.source-row{border-top:1px dotted var(--rule-soft);margin-top:7px;padding-top:7px}.source-links{display:flex;gap:6px;flex-wrap:wrap}.source-link{font-size:10px}.audit-details{border:1px solid var(--rule-soft);margin-bottom:7px}.audit-details summary{cursor:pointer;padding:8px;display:flex;justify-content:space-between;gap:10px;font-size:10px}.audit-details-body{padding:8px;display:grid;gap:8px}.prompt-block h5{margin:0 0 3px;text-transform:uppercase;font-size:9px;color:var(--muted)}.audit-notice{padding:8px;border:1px solid var(--rule-soft);background:var(--paper);font-size:10px;margin-bottom:8px}.scenario-badge{display:inline-block;border:1px solid var(--rule-soft);padding:2px 4px;font:9px var(--mono);margin-bottom:5px}
+    .profile-modal{width:min(560px,94vw)}.profile-form{padding:14px}.checkline{display:flex;align-items:center;gap:7px;font-size:11px;margin:8px 0}.checkline input{width:auto}.profile-note{font-size:10px;color:var(--muted);padding:8px;background:var(--paper);border:1px solid var(--rule-soft)}
+    /* v0.14.1 responsive containment: dynamic machine text must never grow the page. */
+    html,body{width:100%;max-width:100%;overflow-x:hidden}.shell{width:100%;max-width:1500px;min-width:0}.workspace-view,.desk-grid,.left-rail,.main-stack,.panel,.panel-head,.panel-body,.hero>*,.metrics>*,.observatory-grid>*,.work-grid>*,.library-grid>*,.activity-grid>*,.result-head>*,.result-actions,.modal,.modal-head>*,.modal-foot>*,.modal-body>*,.prompt-editor,.audit-body,.audit-card,.audit-step>*,.activity-event>*{min-width:0;max-width:100%}
+    .desk-grid{grid-template-columns:330px minmax(0,1fr)}.field-row,.work-grid,.library-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.metrics{grid-template-columns:repeat(4,minmax(0,1fr))}.hero{grid-template-columns:minmax(0,1fr) auto}.activity-grid{grid-template-columns:300px minmax(0,1fr)}.activity-event{grid-template-columns:72px 90px minmax(0,1fr)}.slow-row{grid-template-columns:minmax(0,1fr) 70px}.audit-step{grid-template-columns:175px minmax(0,1fr) auto}
+    input,select,textarea,button{max-width:100%}input,select,textarea{min-width:0}.profile-tools,.server-tools,.result-actions,.company-toolbar,.share-presets,.button-row{min-width:0}.profile-select{max-width:100%}.model-pill,.status-pill{min-width:0;max-width:100%;overflow:hidden;text-overflow:ellipsis}.model-pill{max-width:min(34vw,360px)}
+    .panel,.result-body,.overview,.result-card,.chip,.task,.log,.activity-run,.activity-meta,.activity-event,.audit-card,.audit-step,.audit-details,.audit-details summary,.source-row,.advisor-copy,.config-item,.library-hero,.section-title{overflow-wrap:anywhere;word-break:break-word}.log>div:last-child,.activity-event>div:last-child,.activity-event .autosave,.audit-body .autosave,.audit-details summary span,.source-link,.audit-card p,.audit-step span{min-width:0;overflow-wrap:anywhere;word-break:break-word;white-space:normal}.config-list{grid-template-columns:minmax(0,1fr)}.config-item{width:100%;min-width:0;max-width:100%}.config-item span{min-width:0}.config-item span:first-child{flex:0 0 auto}.config-item span:last-child{flex:0 1 190px;max-width:60%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.task-name{min-width:0}.overview{width:100%}
+    .ledger-wrap{width:100%;max-width:100%;overflow-x:auto;overscroll-behavior-inline:contain;-webkit-overflow-scrolling:touch}.ledger{min-width:620px;table-layout:fixed}.ledger th,.ledger td{overflow-wrap:anywhere;word-break:break-word}.ledger th:nth-child(1){width:38%}.ledger th:nth-child(2){width:16%}.ledger th:nth-child(3){width:26%}.ledger th:nth-child(4){width:20%}
+    .modal-shell{padding:clamp(8px,2vw,18px);overflow:auto;align-items:center;justify-items:center}.modal,.share-modal,.profile-modal,.audit-modal{width:100%;max-width:100%}.modal{max-width:1100px;max-height:calc(100dvh - 16px)}.share-modal{max-width:780px}.profile-modal{max-width:560px}.audit-modal{max-width:1250px;height:min(900px,calc(100dvh - 16px))}.modal-head,.modal-foot{min-width:0}.prompt-meta{min-width:0;flex-wrap:wrap}.profile-field{min-width:0;flex-wrap:wrap}.profile-field input{flex:1 1 220px}.share-presets{flex-wrap:wrap}.audit-details summary{align-items:flex-start}.toast{right:clamp(8px,2vw,20px);max-width:min(380px,calc(100vw - 16px))}
+    @media(max-width:1100px){.observatory-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.obs-card:nth-child(3){border-right:0}.desk-grid{grid-template-columns:minmax(0,1fr)}.left-rail{position:static;grid-template-columns:repeat(2,minmax(0,1fr))}.company-index{grid-template-columns:repeat(3,minmax(0,1fr))}.library-grid{grid-template-columns:minmax(0,1fr)}.utility{grid-template-columns:minmax(0,1fr) auto}.profile-tools{grid-column:1/-1}.model-pill{justify-self:start;max-width:100%}.server-tools{justify-content:flex-end}}
+    @media(max-width:760px){.observatory-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.obs-card:nth-child(odd){border-right:1px dotted var(--rule-soft)}.obs-card:nth-child(even){border-right:0}.advisor-row{align-items:flex-start;flex-direction:column}.shell{padding:10px}.utility{grid-template-columns:minmax(0,1fr)}.profile-tools,.server-tools{width:100%;justify-content:flex-start}.model-pill{justify-self:stretch;width:100%;max-width:100%}.nav{justify-content:flex-start;overflow-x:auto;max-width:100%;scrollbar-width:thin}.left-rail{grid-template-columns:minmax(0,1fr)}.metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.work-grid,.result-grid,.audit-grid{grid-template-columns:minmax(0,1fr)}.company-index{grid-template-columns:repeat(2,minmax(0,1fr))}.activity-grid{grid-template-columns:minmax(0,1fr)}.modal-body{grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr)}.prompt-nav{border-right:0;border-bottom:1px solid var(--rule-soft);display:flex;overflow-x:auto;max-width:100%}.prompt-tab{min-width:150px}.audit-step{grid-template-columns:minmax(0,1fr)}.activity-event{grid-template-columns:minmax(0,1fr)}.masthead h1{font-size:23px}.hero{grid-template-columns:minmax(0,1fr)}.hero-state{text-align:left}.result-head,.library-hero,.section-title{align-items:flex-start;flex-direction:column}.result-actions{width:100%}.result-actions>button{flex:1 1 150px}.company-toolbar{flex-wrap:wrap}.company-toolbar input{width:100%;max-width:none}.modal-head,.modal-foot{align-items:flex-start;flex-wrap:wrap}.share-sections{grid-template-columns:minmax(0,1fr)}}
+    @media(max-width:520px){.llm-request-meta,.chunk-doc-meta{grid-template-columns:minmax(0,1fr)}.ledger-summary{align-items:flex-start;flex-direction:column}.shell{padding:8px}.masthead{padding-top:2px}.masthead h1{font-size:20px}.field-row{grid-template-columns:minmax(0,1fr)}.metrics,.observatory-grid,.company-index{grid-template-columns:minmax(0,1fr)}.obs-card{border-right:0!important;border-bottom:1px dotted var(--rule-soft)}.obs-card:last-child{border-bottom:0}.profile-tools{display:grid;grid-template-columns:minmax(0,1fr)}.profile-select,.profile-tools .text-btn{width:100%}.server-tools{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center}.server-tools .status-pill,.server-tools .prompt-btn{width:100%}.server-tools .status-pill{grid-column:1/-1}.nav-btn{padding-inline:12px}.hero{padding:13px}.hero h2,.library-hero h2{font-size:21px}.elapsed{font-size:22px}.result-body,.panel-body,.audit-body,.prompt-editor{padding:10px}.ledger{min-width:560px}.modal-shell{padding:6px}.audit-modal{height:calc(100dvh - 12px)}#promptText{min-height:260px}.toast{left:8px;right:8px;bottom:8px;max-width:none}}
+  </style>
+</head>
+<body>
+<div class="shell">
+  <header class="masthead">
+    <h1><span class="cap">I</span>DX <span class="cap">S</span>IGNAL <span class="cap">D</span>ESK</h1>
+    <div class="address">Local Disclosure Intelligence Archive · 127.0.0.1</div>
+    <div class="subtitle">Official Research Home Page</div>
+  </header>
+  <hr class="rule">
+  <div class="utility">
+    <div class="profile-tools">
+      <span class="profile-label">Research profile</span>
+      <select class="profile-select" id="profileSelect" aria-label="Research profile"></select>
+      <button class="text-btn" id="newProfileButton" type="button">New profile</button>
+      <button class="text-btn" id="deleteProfileButton" type="button" disabled>Delete profile</button>
+      <span class="autosave" id="autoSaveStatus">Loading profile…</span>
+    </div>
+    <span class="model-pill" id="modelPill">Loading model…</span>
+    <div class="server-tools">
+      <span class="status-pill"><i class="dot" id="connectionDot"></i><span id="connectionText">Connecting</span></span>
+      <button class="prompt-btn" id="promptButton" type="button">Prompt Studio</button>
+      <button class="icon-btn" id="themeButton" title="Toggle paper / midnight" aria-label="Toggle theme">◐</button>
+    </div>
+  </div>
+  <nav class="nav" aria-label="Workspace">
+    <button class="nav-btn active" type="button" data-view="desk">Desk</button>
+    <button class="nav-btn" type="button" data-view="library">Library</button>
+    <button class="nav-btn" type="button" data-view="companies">Companies</button>
+    <button class="nav-btn" type="button" data-view="activity">Activity</button>
+  </nav>
+
+  <section class="workspace-view active" id="viewDesk">
+    <div class="desk-grid">
+      <aside class="left-rail">
+        <section class="panel">
+          <div class="panel-head"><h2>Next Run Settings</h2><p>Editable settings for the next job. The active run keeps its frozen request snapshot.</p></div>
+          <form class="panel-body" id="runForm">
+            <div class="field"><label for="start">Start · Jakarta</label><input id="start" type="datetime-local" required></div>
+            <div class="field"><label for="end">End · Jakarta</label><input id="end" type="datetime-local" required></div>
+            <div class="field-row">
+              <div class="field"><label for="ticker">Ticker</label><input id="ticker" type="text" placeholder="Blank = ALL companies" maxlength="12" autocapitalize="characters"><small>Leave blank to scrape all listed companies.</small></div>
+              <div class="field"><label for="maxAnnouncements">Max items</label><input id="maxAnnouncements" type="number" min="1" placeholder="No cap"></div>
+            </div>
+            <div class="field"><label for="keyword">IDX keyword filter</label><input id="keyword" type="text" placeholder="Optional"></div><div class="field"><label>Concurrency preset</label><div class="preset-row"><button class="secondary" id="presetConservative" type="button">Conservative</button><button class="secondary" id="presetBalanced" type="button">Balanced</button><button class="secondary" id="presetHigh" type="button">High throughput</button></div><div class="config-warning" id="concurrencyWarning"></div></div>
+            <div class="field"><label for="concurrency">Global LLM slots</label><div class="range-line"><input id="concurrency" type="range" min="1" max="8" value="2"><span class="range-value" id="concurrencyValue">2</span></div><small>Shared across all tickers and LLM stages.</small></div>
+            <div class="field-row">
+              <div class="field"><label for="perAnnouncementConcurrency">Per disclosure cap</label><div class="range-line"><input id="perAnnouncementConcurrency" type="range" min="1" max="8" value="2"><span class="range-value" id="perAnnouncementConcurrencyValue">2</span></div><small>Hard cap across documents, chunks, and reducers from one disclosure.</small></div>
+              <div class="field"><label for="documentChunkConcurrency">Long-document chunks</label><div class="range-line"><input id="documentChunkConcurrency" type="range" min="1" max="4" value="2"><span class="range-value" id="documentChunkConcurrencyValue">2</span></div><small>Parallel chunks may burst into idle capacity, but yield newly freed provider slots to reducers and ordinary documents that are waiting.</small></div>
+            </div>
+            <div class="field-row">
+              <div class="field"><label for="extractionWorkers">Extraction workers</label><div class="range-line"><input id="extractionWorkers" type="range" min="1" max="8" value="3"><span class="range-value" id="extractionWorkersValue">3</span></div><small>Local PDF/XLSX/OCR work only.</small></div>
+              <div class="field"><label for="extractionQueueSize">Extraction backlog</label><div class="range-line"><input id="extractionQueueSize" type="range" min="2" max="32" value="8"><span class="range-value" id="extractionQueueSizeValue">8</span></div><small>Backpressure limit for active + queued extraction.</small></div>
+            </div>
+            <div class="switch-row"><div class="switch-copy"><strong>Listed stocks only</strong><span>Exclude ETF, reksa dana, structured warrants and other instruments.</span></div><label class="switch"><input id="stockOnly" type="checkbox" checked><span class="slider"></span></label></div>
+            <div class="switch-row"><div class="switch-copy"><strong>Historical audit / backfill</strong><span>Off by default. Normal runs fill only gaps outside saved coverage. Turn on to force a full re-check, including dates already marked covered.</span></div><label class="switch"><input id="historicalAudit" type="checkbox"><span class="slider"></span></label></div>
+            <div class="switch-row"><div class="switch-copy"><strong>Smart primary attachments</strong><span>Keep substantive evidence, including XLSX + true LK PDF for financials.</span></div><label class="switch"><input id="smartAttachments" type="checkbox" checked><span class="slider"></span></label></div>
+            <div class="switch-row"><div class="switch-copy"><strong>OpenRouter summaries</strong><span>Disable for scrape-only tests.</span></div><label class="switch"><input id="enableLlm" type="checkbox" checked><span class="slider"></span></label></div>
+            <div class="switch-row"><div class="switch-copy"><strong>Adaptive provider slots</strong><span>Back off on OpenRouter throttling, then ramp up after healthy responses.</span></div><label class="switch"><input id="adaptiveLlm" type="checkbox" checked><span class="slider"></span></label></div>
+            <div class="switch-row"><div class="switch-copy"><strong>Routine filing triage</strong><span>Low-risk monthly holder reports use one direct evidence call; suspicious cases keep the full pipeline.</span></div><label class="switch"><input id="routineTriage" type="checkbox" checked><span class="slider"></span></label></div>
+            <div class="switch-row"><div class="switch-copy"><strong>Safe duplicate suppression</strong><span>After extraction, suppress only exact or extremely similar same-format sources.</span></div><label class="switch"><input id="safeDedup" type="checkbox" checked><span class="slider"></span></label></div>
+            <div class="switch-row"><div class="switch-copy"><strong>Browser trace</strong><span>Save browser/network diagnostics.</span></div><label class="switch"><input id="traceBrowser" type="checkbox" checked><span class="slider"></span></label></div>
+            <div class="switch-row"><div class="switch-copy"><strong>Headless Chromium</strong><span>Leave off when human verification may appear.</span></div><label class="switch"><input id="headless" type="checkbox"><span class="slider"></span></label></div>
+            <div class="run-actions">
+              <button class="primary" id="runButton" type="submit">Run disclosure digest</button>
+              <button class="secondary resume-run" id="resumeButton" type="button" hidden>Resume interrupted run</button>
+              <button class="secondary resume-run" id="recoverButton" type="button">Open cached checkpoints</button>
+              <button class="secondary resume-run" id="finishCachedButton" type="button">Finish cached company digests</button>
+              <button class="secondary resume-run" id="refineFinancialsButton" type="button">Refine cached financial reports</button>
+            </div>
+            <div class="hint">Form settings autosave to the active research profile. Run streams and checkpoints save continuously while the run is executing.</div>
+          </form>
+        </section>
+        <section class="panel">
+          <div class="panel-head"><h2>Runtime & Profile</h2><p>Local configuration. Secrets never enter the browser page.</p></div>
+          <div class="panel-body config-list">
+            <div class="config-item"><span>Profile</span><span id="profileName">—</span></div>
+            <div class="config-item"><span>Version</span><span id="version">—</span></div>
+            <div class="config-item"><span>Provider</span><span id="provider">—</span></div>
+            <div class="config-item"><span>Timezone</span><span id="timezone">—</span></div>
+            <div class="config-item"><span>API key</span><span id="apiKey">—</span></div>
+            <div class="config-item"><span>Prompt profile</span><span id="promptProfile">—</span></div><div class="config-item"><span>Company cache</span><span id="companyCacheMode">—</span></div><div class="config-item"><span>Network recovery</span><span id="networkRecoveryMode">—</span></div><div class="config-item"><span>Stock allowlist</span><span id="stockMasterMode">—</span></div>
+            <div class="config-item"><span>Data</span><span id="dataDir">—</span></div>
+          </div>
+        </section>
+      </aside>
+
+      <main class="main-stack">
+        <section class="panel active-run-strip" id="activeRunStrip"><div><strong id="activeRunTitle">Active run</strong><div class="active-run-meta" id="activeRunMeta"></div></div><span class="network-state online" id="networkState">NETWORK ONLINE</span></section>
+        <section class="panel hero"><div><h2 id="heroTitle">Ready for the next disclosure window.</h2><p id="heroCopy">Start a new run here, or use Library to reopen any saved intelligence window without touching this form.</p></div><div class="hero-state"><div class="elapsed" id="elapsed">00:00</div><div class="elapsed-label" id="elapsedLabel">idle</div></div></section>
+        <section class="metrics">
+          <div class="panel metric"><div class="metric-label">Announcements</div><div class="metric-value" id="metricAnnouncements">0</div><div class="metric-note" id="metricAnnouncementsNote">waiting</div></div>
+          <div class="panel metric"><div class="metric-label">Active tasks</div><div class="metric-value" id="metricTasks">0</div><div class="metric-note" id="metricTasksNote">pipeline is idle</div></div>
+          <div class="panel metric"><div class="metric-label">Cache hits</div><div class="metric-value" id="metricCache">0</div><div class="metric-note" id="metricCacheNote">files, text and summaries</div></div>
+          <div class="panel metric"><div class="metric-label">Errors</div><div class="metric-value" id="metricErrors">0</div><div class="metric-note" id="metricErrorsNote">clean run</div></div>
+        </section>
+        <section class="panel observatory" id="observatoryPanel">
+          <div class="section-title"><h3>Pipeline Observatory</h3><span id="observatoryStatus">idle telemetry</span></div>
+          <div class="observatory-grid">
+            <div class="obs-card"><div class="obs-label">LLM slots</div><div class="obs-value" id="obsLlmSlots">0 / 0</div><div class="obs-note" id="obsLlmNote">global scheduler</div><div class="mini-bar"><i id="obsLlmBar"></i></div></div>
+            <div class="obs-card"><div class="obs-label">Provider gate</div><div class="obs-value" id="obsProviderSlots">0 / 0</div><div class="obs-note" id="obsProviderNote">adaptive request cap</div><div class="mini-bar"><i id="obsProviderBar"></i></div></div>
+            <div class="obs-card"><div class="obs-label">Extraction</div><div class="obs-value" id="obsExtractSlots">0 / 0</div><div class="obs-note" id="obsExtractNote">bounded workers</div><div class="mini-bar"><i id="obsExtractBar"></i></div></div>
+            <div class="obs-card"><div class="obs-label">Queues</div><div class="obs-value" id="obsQueues">0 + 0</div><div class="obs-note" id="obsQueuesNote">LLM + extraction</div></div>
+            <div class="obs-card"><div class="obs-label">Throughput</div><div class="obs-value" id="obsThroughput">—</div><div class="obs-note" id="obsThroughputNote">announcements / min</div></div>
+            <div class="obs-card"><div class="obs-label">ETA / latency</div><div class="obs-value" id="obsEta">—</div><div class="obs-note" id="obsLatency">provider latency —</div></div>
+          </div>
+          <div class="advisor-row"><div class="advisor-copy"><strong id="advisorBottleneck">Tuning advisor waiting for a completed run.</strong><span id="advisorReason">Live concurrency stays under your explicit limits. Recommendations apply to the next run only.</span></div><button class="secondary" id="applyTuningButton" type="button" disabled>Apply next-run tuning</button></div>
+        </section>
+        <section class="work-grid">
+          <div class="panel"><div class="section-title"><h3>Live Work Ledger</h3><span id="workerLabel">No active workers</span></div><div class="tasks" id="tasks"><div class="empty">Progress rows appear when a run starts.</div></div></div>
+          <div class="panel"><div class="section-title"><h3>Event Pulse</h3><span id="eventCount">0 events</span></div><div class="timeline" id="timeline"><div class="empty">Major stages will land here, quietly.</div></div></div>
+        </section>
+        <section class="panel results">
+          <div class="result-head"><h3>Company Digest</h3><div class="result-actions"><button class="audit-btn" id="inspectButton" type="button">Inspect ticker</button><button class="share-btn" id="shareButton" type="button">Copy / export all</button><button class="secondary" id="snapshotButton" type="button">Save run snapshot</button><div class="result-actions" id="artifactLinks"></div></div></div>
+          <div class="tabs ticker-tabs" id="tickerTabs"></div><div class="tabs" id="tabs"></div><div class="result-body" id="resultBody"><div class="empty">Validated company summaries appear here as soon as each company checkpoint is committed.</div></div>
+        </section>
+        <section class="panel" id="slowPanel" hidden><div class="section-title"><h3>Slowest Stages</h3><span>Where the clock went</span></div><div class="panel-body slow-list" id="slowList"></div></section>
+      </main>
+    </div>
+  </section>
+
+  <section class="workspace-view" id="viewLibrary">
+    <div class="library-hero"><div><h2>Saved Intelligence</h2><p>Persistent summary windows and run archives for the active profile. New Run dates do not filter this page.</p></div><button class="secondary" id="refreshLibraryButton" type="button">Refresh library</button></div>
+    <div class="statline" id="libraryStats"><span><b>0</b> company summaries</span></div>
+    <div class="library-grid">
+      <section class="panel"><div class="panel-head"><h3>Summary Windows</h3><p>Click a row to open all saved company digests from that exact window.</p></div><div class="panel-body" id="libraryWindows"><div class="empty">Loading saved windows…</div></div></section>
+      <section class="panel"><div class="panel-head"><h3>Run Archive</h3><p>Every persisted run remains attached to its profile, including interrupted runs.</p></div><div class="panel-body" id="libraryRuns"><div class="empty">Loading run archive…</div></div></section>
+    </div>
+  </section>
+
+  <section class="workspace-view" id="viewCompanies">
+    <div class="library-hero"><div><h2>Company Index</h2><p>One permanent index of every ticker with a saved company digest in this profile.</p></div></div>
+    <div class="company-toolbar"><input id="companySearch" type="text" placeholder="Search ticker or summary"><span class="autosave" id="companyCount">0 companies</span></div>
+    <div class="company-index" id="companyIndex"><div class="empty">No company summaries yet.</div></div>
+  </section>
+
+  <section class="workspace-view" id="viewActivity">
+    <div class="library-hero"><div><h2>Activity Archive</h2><p>The live stream is a durable research record. Reopen it after restart, then save a complete run snapshot.</p></div><div class="button-row"><button class="secondary" id="saveSnapshotButton" type="button">Save selected run snapshot</button><a class="link-btn" id="downloadStreamButton" href="#">Open stream JSONL</a></div></div>
+    <div class="activity-grid">
+      <section class="panel"><div class="panel-head"><h3>Runs</h3><p>Newest first.</p></div><div class="activity-list" id="activityRunList"><div class="empty">No runs saved.</div></div></section>
+      <section class="panel"><div class="panel-head"><h3>Stream Transcript</h3><p id="activityRunTitle">Select a run.</p></div><div class="activity-meta" id="activityMeta">No run selected.</div><div class="activity-timeline" id="activityTimeline"><div class="empty">Saved events will appear here.</div></div></section>
+    </div>
+  </section>
+
+  <div class="footer-note"><strong>IDX Signal Desk v0.15.5</strong> · local-only interface · no analytics · profile data is isolated on disk · company aggregation remains ticker-by-ticker only.</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="modal-shell" id="profileModal" aria-hidden="true">
+  <section class="modal profile-modal" role="dialog" aria-modal="true" aria-labelledby="profileModalTitle">
+    <div class="modal-head"><div><h2 id="profileModalTitle">Create research profile</h2><p>A new profile starts with zero runs and zero summaries.</p></div><button class="icon-btn" id="profileClose" type="button">×</button></div>
+    <div class="profile-form">
+      <div class="field"><label for="newProfileName">Profile name</label><input id="newProfileName" type="text" maxlength="80" placeholder="e.g. Earnings research"></div>
+      <div class="field"><label for="newProfileDescription">Description</label><input id="newProfileDescription" type="text" maxlength="240" placeholder="Optional"></div>
+      <label class="checkline"><input id="copyProfileConfig" type="checkbox" checked> Copy current run-form configuration</label>
+      <label class="checkline"><input id="copyProfilePrompts" type="checkbox" checked> Copy current Prompt Studio configuration</label>
+      <div class="profile-note">Only configuration is copied. SQLite summaries, run streams, attachments, exports, and audit history remain empty in the new profile.</div>
+    </div>
+    <div class="modal-foot"><div class="modal-note">The active `.env` credentials remain global and are not copied into profile files.</div><div class="button-row"><button class="secondary" id="profileCancel" type="button">Cancel</button><button class="primary" id="profileCreate" type="button">Create & switch</button></div></div>
+  </section>
+</div>
+
+<div class="modal-shell" id="promptModal" aria-hidden="true">
+  <section class="modal" role="dialog" aria-modal="true" aria-labelledby="promptModalTitle">
+    <div class="modal-head"><div><h2 id="promptModalTitle">Prompt Studio</h2><p>Edit each reasoning layer. Prompt hashes continue to control cache reuse automatically.</p></div><button class="icon-btn" id="promptClose" type="button">×</button></div>
+    <div class="modal-body"><nav class="prompt-nav" id="promptNav"></nav><div class="prompt-editor"><div class="prompt-meta"><div><h3 id="promptTitle">Prompt</h3><div class="prompt-stats" id="promptStats">—</div></div><div class="profile-field"><label for="promptProfileInput">Prompt profile</label><input id="promptProfileInput" maxlength="80"></div></div><div class="variables" id="promptVariables"></div><textarea id="promptText" spellcheck="false"></textarea></div></div>
+    <div class="modal-foot"><div class="modal-note">Examples are classification guidance only and must never leak issuer facts into another company.</div><div class="button-row"><button class="danger-btn" id="promptResetAll" type="button">Reset all</button><button class="secondary" id="promptReset" type="button">Reset this layer</button><button class="primary" id="promptSave" type="button">Save prompt</button></div></div>
+  </section>
+</div>
+
+<div class="modal-shell" id="shareModal" aria-hidden="true">
+  <section class="modal share-modal" role="dialog" aria-modal="true" aria-labelledby="shareModalTitle">
+    <div class="modal-head"><div><h2 id="shareModalTitle">Share company digests</h2><p>Append saved ticker summaries into one friend-ready file. Zero LLM calls.</p></div><button class="icon-btn" id="shareClose" type="button">×</button></div>
+    <div class="share-body"><div class="share-scope" id="shareScope"></div><div class="field"><label>Quick selection</label></div><div class="share-presets"><button class="share-preset active" id="sharePresetFriend" type="button">Friend-ready</button><button class="share-preset" id="sharePresetSignals" type="button">Signals only</button><button class="share-preset" id="sharePresetFull" type="button">Everything</button></div><div class="field"><label>Sections</label></div><div class="share-sections" id="shareSections"></div><div class="share-status" id="shareStatus">No cross-company analysis. Tickers are appended alphabetically.</div></div>
+    <div class="modal-foot"><div class="modal-note">Uses saved company-window summaries only. No IDX or OpenRouter calls.</div><div class="button-row"><button class="secondary" id="shareTxt" type="button">TXT</button><button class="secondary" id="shareMd" type="button">Markdown</button><button class="primary" id="shareCopy" type="button">Copy all</button></div></div>
+  </section>
+</div>
+
+<div class="modal-shell" id="auditModal" aria-hidden="true">
+  <section class="modal audit-modal" role="dialog" aria-modal="true" aria-labelledby="auditModalTitle">
+    <div class="modal-head"><div><h2 id="auditModalTitle">Ticker inspector</h2><p id="auditModalMeta">Saved checkpoints, prompt lineage, source attachments and timing.</p></div><button class="icon-btn" id="auditClose" type="button">×</button></div>
+    <nav class="audit-tabs" id="auditTabs"></nav><div class="audit-body" id="auditBody"><div class="empty">Choose a ticker to inspect.</div></div>
+  </section>
+</div>
+
+<script>
+
+(() => {
+  const $ = (id) => document.getElementById(id);
+  const state = {
+    runId: null,
+    status: 'idle',
+    startedAt: null,
+    timer: null,
+    source: null,
+    tasks: new Map(),
+    llmRequests: new Map(),
+    documentChunks: new Map(),
+    requestLatency: {},
+    lastLedgerTick: 0,
+    logs: [],
+    seenSeq: new Set(),
+    announcementIds: new Set(),
+    cacheHits: 0,
+    errors: 0,
+    summaries: {},
+    partialSummaries: {},
+    artifacts: [],
+    report: null,
+    activeRequest: null,
+    companyCache: {eligible:0,cache_hits:0,promoted_single:0,rebuilding:0,skipped_no_evidence:0},
+    activeTicker: null,
+    activeTab: 'overview',
+    promptData: null,
+    activePromptKey: 'system',
+    profiles: [],
+    activeProfileId: null,
+    library: {windows:[], companies:[], runs:[], counts:{}},
+    resultContext: null,
+    currentView: 'desk',
+    profileSaveTimer: null,
+    activityRunId: null,
+    auditTab: 'summary',
+    auditData: null,
+    loadedAudits: {},
+    pipeline: {
+      llmActive:0,llmLimit:0,llmPending:0,providerActive:0,providerLimit:0,providerConfigured:0,
+      providerLatency:0,extractActive:0,extractWorkers:0,extractPending:0,extractBacklog:0,
+      metadataTotal:0,metadataExpected:0,metadataPartial:false,metadataNoop:false,completedIds:new Set(),completionTimes:[],companyTotal:0,companyCompleted:0,companyStartedAt:0
+    },
+    tuningRecommendation: null,
+    idxRateLimitUntil: 0
+  };
+
+  function toast(message, error=false) {
+    const el = $('toast');
+    el.textContent = message;
+    el.className = 'toast show' + (error ? ' error' : '');
+    clearTimeout(el._timer);
+    el._timer = setTimeout(() => el.className = 'toast', 4200);
+  }
+  function escapeHtml(value='') {
+    return String(value).replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+  }
+  function formatElapsed(seconds) {
+    seconds = Math.max(0, Math.floor(seconds || 0));
+    const h = Math.floor(seconds / 3600), m = Math.floor((seconds % 3600) / 60), s = seconds % 60;
+    return h ? `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}` : `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  }
+  function renderActiveRun() {
+    const req=state.activeRequest; const strip=$('activeRunStrip');
+    if(!req || !['running','queued'].includes(state.status)){ strip.classList.remove('show'); return; }
+    strip.classList.add('show');
+    const ticker=(req.ticker||'ALL').toUpperCase();
+    $('activeRunTitle').textContent=`Active run · ${ticker}`;
+    const mode=req.metadata_mode==='historical_audit'?'HISTORICAL AUDIT':'INCREMENTAL';
+    $('activeRunMeta').innerHTML=`<span>${escapeHtml(req.start||'')} → ${escapeHtml(req.end||'')}</span><span>${mode}</span><span>LLM ${Number(req.llm_concurrency||0)} global / ${Number(req.llm_per_announcement_concurrency||0)} disclosure</span><span>chunks ${Number(req.llm_document_chunk_concurrency||0)}</span>`;
+  }
+  function applyPreset(name){
+    const presets={conservative:[4,2,2,3,8],balanced:[6,3,2,4,12],high:[8,4,3,6,24]}; const v=presets[name]; if(!v)return;
+    [['concurrency','concurrencyValue',v[0]],['perAnnouncementConcurrency','perAnnouncementConcurrencyValue',v[1]],['documentChunkConcurrency','documentChunkConcurrencyValue',v[2]],['extractionWorkers','extractionWorkersValue',v[3]],['extractionQueueSize','extractionQueueSizeValue',v[4]]].forEach(([id,label,val])=>{$(id).value=val;$(label).textContent=val;});
+    renderConcurrencyWarning(); scheduleProfileSave();
+  }
+  function renderConcurrencyWarning(){
+    const g=Number($('concurrency').value), d=Number($('perAnnouncementConcurrency').value), c=Number($('documentChunkConcurrency').value); const el=$('concurrencyWarning');
+    const warnings=[]; if(d>=g && g>1) warnings.push('Per-disclosure cap equals the global pool. One disclosure may occupy every LLM slot.'); if(g>=8) warnings.push('8 global slots is aggressive. Adaptive provider backoff remains enabled when selected.'); if(c>=g) warnings.push('Long-document chunk cap can consume the whole global pool when idle.');
+    el.textContent=warnings.join(' '); el.classList.toggle('show',warnings.length>0);
+  }
+  function localClock(iso) {
+    if (!iso) return '—';
+    const d = new Date(iso);
+    return Number.isNaN(d.getTime()) ? iso.slice(11,19) : d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+  }
+  function setConnection(status, text) {
+    $('connectionDot').className = 'dot ' + status;
+    $('connectionText').textContent = text;
+  }
+  function defaultDates() {
+    const now = new Date();
+    const y = now.getFullYear(), m = String(now.getMonth()+1).padStart(2,'0'), d = String(now.getDate()).padStart(2,'0');
+    $('start').value = `${y}-${m}-${d}T00:00`;
+    $('end').value = `${y}-${m}-${d}T23:59`;
+  }
+  function resetRunUi() {
+    state.tasks.clear(); state.llmRequests.clear(); state.documentChunks.clear(); state.requestLatency = {}; state.lastLedgerTick = 0; state.logs = []; state.seenSeq.clear(); state.announcementIds.clear();
+    state.cacheHits = 0; state.errors = 0; state.summaries = {}; state.partialSummaries = {}; state.artifacts = []; state.report = null; state.companyCache={eligible:0,cache_hits:0,promoted_single:0,rebuilding:0,skipped_no_evidence:0}; state.idxRateLimitUntil=0;
+    state.pipeline = {llmActive:0,llmLimit:Number($('concurrency')?.value||0),llmPending:0,providerActive:0,providerLimit:Number($('concurrency')?.value||0),providerConfigured:Number($('concurrency')?.value||0),providerLatency:0,extractActive:0,extractWorkers:Number($('extractionWorkers')?.value||0),extractPending:0,extractBacklog:Number($('extractionQueueSize')?.value||0),metadataTotal:0,metadataExpected:0,metadataPartial:false,metadataNoop:false,completedIds:new Set(),completionTimes:[],companyTotal:0,companyCompleted:0,companyStartedAt:0};
+    state.tuningRecommendation = null;
+    $('timeline').innerHTML = '<div class="empty">Major stages will land here, quietly.</div>';
+    $('tasks').innerHTML = '<div class="empty">Preparing run…</div>';
+    $('resultBody').innerHTML = '<div class="empty">Waiting for validated summaries.</div>';
+    $('tabs').innerHTML = ''; $('artifactLinks').innerHTML = ''; $('slowPanel').hidden = true; $('resumeButton').hidden = true;
+    renderMetrics(); renderObservatory();
+  }
+  function startTimer() {
+    clearInterval(state.timer);
+    state.timer = setInterval(() => {
+      if (!state.startedAt) return;
+      const end = state.status === 'running' ? Date.now() : (state.finishedAt || Date.now());
+      $('elapsed').textContent = formatElapsed((end - state.startedAt) / 1000);
+      if(state.idxRateLimitUntil > Date.now()){
+        const left=Math.ceil((state.idxRateLimitUntil-Date.now())/1000);
+        $('networkState').textContent=`IDX RATE LIMITED · ${left}s`;
+        $('networkState').className='network-state throttled';
+      } else if(state.idxRateLimitUntil){
+        state.idxRateLimitUntil=0;
+        $('networkState').textContent='IDX RETRYING';
+        $('networkState').className='network-state throttled';
+      }
+      const second = Math.floor(Date.now()/1000);
+      if ((state.llmRequests.size || state.documentChunks.size) && second !== state.lastLedgerTick) { state.lastLedgerTick = second; renderTasks(); }
+    }, 500);
+  }
+
+  function pct(value, limit) { return limit > 0 ? Math.min(100, Math.max(0, Number(value||0) / Number(limit) * 100)) : 0; }
+  function rollingThroughput() {
+    const times = state.pipeline.completionTimes || [];
+    if (!times.length || !state.startedAt) return 0;
+    if (times.length === 1) { const mins=Math.max((times[0]-state.startedAt)/60000, 1/60); return 1/mins; }
+    const recent=times.slice(-10), mins=Math.max((recent[recent.length-1]-recent[0])/60000, 1/60);
+    return (recent.length-1)/mins;
+  }
+  function chunkAwareRemaining() {
+    const docs=[...state.documentChunks.values()];
+    if(!docs.length) return {requests:0,seconds:0};
+    let requests=0;
+    docs.forEach(d=>{
+      const total=Number(d.chunk_count||0);
+      const done=d.completed instanceof Set?d.completed.size:Number(d.cached_chunks||0);
+      requests += Math.max(0,total-done);
+      if(total>1 && d.combine_state!=='completed') requests += 1;
+    });
+    const stats=requestLatencyStats({schema:'idx_document_summary',chunk_count:2,prompt_characters:22000});
+    const providerAvg=Number(state.pipeline.providerLatency||0) || stats.avg || 40;
+    const capacity=Math.max(1,Number(state.pipeline.providerLimit||state.pipeline.providerConfigured||1));
+    return {requests,seconds:requests/capacity*providerAvg};
+  }
+  function renderObservatory() {
+    const p=state.pipeline;
+    const perf=state.report?.performance || state.report?.diagnostics?.phase4_performance || null;
+    if (perf && state.status !== 'running') {
+      const u=perf.utilization||{}, lat=perf.latency||{}, rec=perf.recommendation||{};
+      $('observatoryStatus').textContent='completed telemetry';
+      $('obsLlmSlots').textContent=`peak ${u.llm_peak||0} / ${u.llm_limit||0}`; $('obsLlmBar').style.width=`${pct(u.llm_peak,u.llm_limit)}%`; $('obsLlmNote').textContent=`queue avg ${Number(lat.llm_queue_average_seconds||0).toFixed(1)}s`;
+      $('obsProviderSlots').textContent=`peak ${u.provider_peak||0} / ${u.provider_configured_limit||0}`; $('obsProviderBar').style.width=`${pct(u.provider_peak,u.provider_configured_limit)}%`; $('obsProviderNote').textContent=`final gate ${perf.provider_pressure?.final_limit||u.provider_configured_limit||0}`;
+      $('obsExtractSlots').textContent=`peak ${u.extraction_peak||0} / ${u.extraction_workers||0}`; $('obsExtractBar').style.width=`${pct(u.extraction_peak,u.extraction_workers)}%`; $('obsExtractNote').textContent=`inflight ${u.extraction_peak_inflight||0}/${u.extraction_backlog_limit||0}`;
+      $('obsQueues').textContent=`${state.report?.diagnostics?.scheduler_metrics?.max_observed_pending||0} + ${state.report?.diagnostics?.extraction_metrics?.max_observed_pending||0}`; $('obsQueuesNote').textContent='peak LLM + extract pending';
+      $('obsThroughput').textContent=Number(perf.throughput_announcements_per_minute||0).toFixed(2); $('obsThroughputNote').textContent='announcements / min';
+      $('obsEta').textContent='done'; $('obsLatency').textContent=`provider avg ${Number(lat.provider_average_seconds||0).toFixed(1)}s`;
+      state.tuningRecommendation=rec;
+      $('advisorBottleneck').textContent=`Observed bottleneck: ${String(perf.bottleneck||'balanced').replaceAll('-',' ')} · ${perf.confidence||'medium'} confidence`;
+      $('advisorReason').textContent=(rec.reasons||[]).slice(0,2).join(' ') || 'No strong tuning change was justified by this run.';
+      $('applyTuningButton').disabled=!rec.changed;
+      return;
+    }
+    $('observatoryStatus').textContent=state.status==='running'?'live telemetry':'idle telemetry';
+    $('obsLlmSlots').textContent=`${p.llmActive||0} / ${p.llmLimit||0}`; $('obsLlmBar').style.width=`${pct(p.llmActive,p.llmLimit)}%`; $('obsLlmNote').textContent=`${p.llmPending||0} queued`;
+    $('obsProviderSlots').textContent=`${p.providerActive||0} / ${p.providerLimit||p.providerConfigured||0}`; $('obsProviderBar').style.width=`${pct(p.providerActive,p.providerLimit||p.providerConfigured)}%`; $('obsProviderNote').textContent=p.providerLimit&&p.providerConfigured&&p.providerLimit<p.providerConfigured?`backed off from ${p.providerConfigured}`:'adaptive request cap';
+    $('obsExtractSlots').textContent=`${p.extractActive||0} / ${p.extractWorkers||0}`; $('obsExtractBar').style.width=`${pct(p.extractActive,p.extractWorkers)}%`; $('obsExtractNote').textContent=`backlog ${p.extractPending||0}/${p.extractBacklog||0}`;
+    $('obsQueues').textContent=`${p.llmPending||0} + ${p.extractPending||0}`; $('obsQueuesNote').textContent='LLM + extraction pending';
+    const rate=rollingThroughput(); $('obsThroughput').textContent=rate>0?rate.toFixed(2):'—'; $('obsThroughputNote').textContent=`${p.completedIds?.size||0}/${p.metadataTotal||'?'} announcements`;
+    const remaining=Math.max(0,(p.metadataTotal||0)-(p.completedIds?.size||0));
+    const baseEta=rate>0&&remaining>0?remaining/rate*60:0; const chunkTail=chunkAwareRemaining();
+    const companyRemaining=Math.max(0,Number(p.companyTotal||0)-Number(p.companyCompleted||0));
+    const companyStats=requestLatencyStats('idx_company_window_summary'); const companyCapacity=Math.max(1,Number(p.providerLimit||p.providerConfigured||p.llmLimit||1));
+    const companyEta=companyRemaining?companyRemaining/companyCapacity*Math.max(5,companyStats.avg||p.providerLatency||40):0;
+    const etaSeconds=Math.max(baseEta,chunkTail.seconds,companyEta);
+    $('obsEta').textContent=etaSeconds>0?formatElapsed(etaSeconds):(remaining===0&&p.metadataTotal&&companyRemaining===0?'finishing':'—');
+    const phase=companyRemaining?`${p.companyCompleted||0}/${p.companyTotal||0} companies · `:(chunkTail.requests?`${chunkTail.requests} chunk req · `:'');
+    $('obsLatency').textContent=p.providerLatency?`${phase}provider avg ${Number(p.providerLatency).toFixed(1)}s`:(companyRemaining?`${phase}company reducer tail`:'provider latency —');
+    if(companyRemaining){$('obsThroughputNote').textContent=`announcements done · ${p.companyCompleted||0}/${p.companyTotal||0} companies`;}
+    $('advisorBottleneck').textContent='Tuning advisor measuring this run.'; $('advisorReason').textContent='A recommendation appears after completion so live limits remain deterministic.'; $('applyTuningButton').disabled=true;
+  }
+  function markAnnouncementComplete(id) {
+    if (!id || state.pipeline.completedIds.has(id)) return;
+    state.pipeline.completedIds.add(id); state.pipeline.completionTimes.push(Date.now());
+    if (state.pipeline.completionTimes.length>30) state.pipeline.completionTimes.shift(); renderObservatory();
+  }
+  function applyTuningRecommendation() {
+    const rec=state.tuningRecommendation; if(!rec||!rec.changed) return;
+    if(rec.global_llm_slots){$('concurrency').value=rec.global_llm_slots;$('concurrencyValue').textContent=rec.global_llm_slots;$('perAnnouncementConcurrency').value=Math.min(Number($('perAnnouncementConcurrency').value),Number(rec.global_llm_slots));$('perAnnouncementConcurrencyValue').textContent=$('perAnnouncementConcurrency').value;}
+    if(rec.extraction_workers){$('extractionWorkers').value=rec.extraction_workers;$('extractionWorkersValue').textContent=rec.extraction_workers;}
+    if(rec.extraction_queue_size){$('extractionQueueSize').value=Math.max(Number($('extractionWorkers').value),Number(rec.extraction_queue_size));$('extractionQueueSizeValue').textContent=$('extractionQueueSize').value;}
+    scheduleProfileSave(); toast('Suggested next-run tuning applied.');
+  }
+
+  function renderMetrics() {
+    const expected=Number(state.report?.metadata_announcements_reported ?? state.pipeline.metadataExpected ?? 0);
+    const scheduled=Number(state.report?.metadata_announcements_scheduled ?? state.pipeline.metadataTotal ?? 0);
+    $('metricAnnouncements').textContent = state.report?.processed_announcements ?? state.announcementIds.size;
+    if(state.status==='running' && state.pipeline.metadataNoop){
+      $('metricAnnouncementsNote').textContent='up to date · no metadata request';
+    } else if(state.status==='running' && state.pipeline.metadataPartial && expected>scheduled){
+      $('metricAnnouncementsNote').textContent=`${scheduled} scheduled · IDX reports ${expected} · partial metadata`;
+    } else {
+      $('metricAnnouncementsNote').textContent = state.status === 'running' ? (expected?`IDX reports ${expected} in requested window`:'discovered in current window') : (state.report ? `${state.report.company_summaries || 0} company digest` : 'waiting');
+    }
+    $('metricTasks').textContent = state.tasks.size + state.llmRequests.size + state.documentChunks.size;
+    const workerTasks = [...state.tasks.values()].filter(t => /summary/i.test(t.description || '')).length;
+    $('metricTasksNote').textContent = state.llmRequests.size ? `${state.llmRequests.size} OpenRouter request${state.llmRequests.size===1?'':'s'} active` : (workerTasks ? `${workerTasks} summary lane${workerTasks === 1 ? '' : 's'}` : (state.tasks.size ? 'browser / extraction work' : 'pipeline is idle'));
+    $('metricCache').textContent = state.cacheHits; $('metricCacheNote').textContent = state.companyCache.cache_hits ? `${state.companyCache.cache_hits} company digests reused` : 'files, text and summaries';
+    $('metricErrors').textContent = state.report?.errors?.length ?? state.errors;
+    $('metricErrorsNote').textContent = (state.report?.errors?.length ?? state.errors) ? 'review event pulse' : 'clean run';
+  }
+  function requestStageLabel(schema='', stage='') {
+    if (stage) return String(stage).replaceAll('_',' ').replaceAll('-',' ');
+    if (schema === 'idx_document_summary') return 'document';
+    if (schema === 'idx_announcement_summary') return 'announcement reducer';
+    if (schema === 'idx_company_window_summary') return 'company reducer';
+    return String(schema || 'LLM request').replace(/^idx_/,'').replaceAll('_',' ');
+  }
+  function requestLatencyKey(req) {
+    if (typeof req === 'string') return req;
+    const schema=String(req?.schema||'unknown');
+    const prompt=Number(req?.prompt_characters||0);
+    if(schema==='idx_document_summary' && Number(req?.chunk_count||0)>1){
+      const size=prompt>=20000?'large':(prompt>=10000?'medium':'small');
+      return `${schema}:chunk:${size}`;
+    }
+    if(schema==='idx_document_summary'){
+      const size=prompt>=18000?'large':(prompt>=8000?'medium':'small');
+      return `${schema}:single:${size}`;
+    }
+    return schema;
+  }
+  function requestLatencyStats(req) {
+    const key=requestLatencyKey(req);
+    const schema=typeof req==='string'?req:String(req?.schema||'unknown');
+    const direct=(state.requestLatency?.[key]||[]).filter(Number.isFinite).slice(-20);
+    const fallbackSamples=(state.requestLatency?.[schema]||[]).filter(Number.isFinite).slice(-20);
+    const samples=direct.length?direct:fallbackSamples;
+    const fallback=Number(state.pipeline.providerLatency||0) || 40;
+    if(!samples.length) return {avg:fallback,p50:fallback,p90:fallback*1.75,samples:0,key};
+    const sorted=[...samples].sort((a,b)=>a-b);
+    const pick=q=>sorted[Math.min(sorted.length-1,Math.max(0,Math.floor((sorted.length-1)*q)))];
+    const avg=samples.reduce((a,b)=>a+b,0)/samples.length;
+    return {avg,p50:pick(.5),p90:Math.max(pick(.9),avg),samples:samples.length,key};
+  }
+  function requestProgress(req, elapsed) {
+    const stateName=req.state||'queued';
+    if(stateName==='response_received') return {pct:96,cls:'response',label:'response received'};
+    if(stateName==='validating') return {pct:98,cls:'validating',label:'validating JSON'};
+    if(stateName==='waiting_provider'||stateName==='waiting_disclosure'||stateName==='queued') return {pct:18,cls:'waiting',label:stateName==='queued'?'queued':(stateName==='waiting_disclosure'?'waiting for disclosure slot':'waiting for provider slot')};
+    if(stateName==='sending') return {pct:8,cls:'waiting',label:'sending request'};
+    const stats=requestLatencyStats(req);
+    const expected=Math.max(5,stats.avg||40);
+    const pct=Math.min(92,Math.max(6,(elapsed/(expected*1.15))*100));
+    return {pct,cls:'estimated',label:elapsed>stats.p90&&stats.samples?`longer than recent p90 (${Math.round(stats.p90)}s)`:`est. against ~${Math.round(expected)}s typical`};
+  }
+  function renderTasks() {
+    const el = $('tasks');
+    const tasks = [...state.tasks.entries()];
+    const requests=[...state.llmRequests.values()].sort((a,b)=>(a.startedMs||0)-(b.startedMs||0));
+    const longDocs=[...state.documentChunks.values()];
+    const providerActive=Math.max(0,Number(state.pipeline.providerActive||0));
+    const waitingProvider=requests.filter(r=>r.state==='waiting_provider').length;
+    const waitingDisclosure=requests.filter(r=>r.state==='waiting_disclosure').length;
+    const queuedRequests=requests.filter(r=>r.state==='queued').length;
+    const validationRequests=requests.filter(r=>r.state==='response_received'||r.state==='validating').length;
+    const waitingRequests=waitingProvider+waitingDisclosure+queuedRequests;
+    const activeCount=tasks.length+requests.length+longDocs.length;
+    $('workerLabel').textContent = activeCount ? `OpenRouter ${providerActive} generating · ${waitingRequests} waiting · ${longDocs.length} long doc${longDocs.length===1?'':'s'}` : 'No active workers';
+    if (!activeCount) {
+      el.innerHTML = `<div class="empty">${state.status === 'running' ? 'Between stages…' : 'No active work.'}</div>`;
+      renderMetrics(); return;
+    }
+    const exactDone=state.pipeline.completedIds?.size||0, exactTotal=state.pipeline.metadataTotal||0;
+    const requestParts=[`${providerActive} generating`]; if(waitingProvider) requestParts.push(`${waitingProvider} waiting provider`); if(waitingDisclosure) requestParts.push(`${waitingDisclosure} waiting disclosure`); if(queuedRequests) requestParts.push(`${queuedRequests} request queued`); if(validationRequests) requestParts.push(`${validationRequests} validating`);
+    const expected=Number(state.pipeline.metadataExpected||0);
+    const totalLabel=exactTotal?`${exactDone}/${exactTotal} announcements complete`:(state.pipeline.metadataNoop?'No new announcements':'Pipeline active');
+    const metadataLabel=state.pipeline.metadataPartial&&expected>exactTotal?` · IDX reports ${expected}, metadata partial`:'';
+    const summary=`<div class="ledger-summary"><strong>${totalLabel}</strong><span>${requestParts.join(' · ')} · ${state.pipeline.llmPending||0} scheduler queued${metadataLabel}</span></div>`;
+    const documentHtml=longDocs.map(doc=>{
+      const total=Number(doc.chunk_count||0); const completed=doc.completed instanceof Set?doc.completed.size:Number(doc.cached_chunks||0);
+      const active=doc.active instanceof Set?doc.active.size:0; const exactPct=total?Math.round(completed/total*100):0;
+      const combining=doc.combine_state==='active'; const label=combining?'COMBINING':`${completed} / ${total} chunks`;
+      const barPct=combining?98:exactPct; const retry=Number(doc.retries||0);
+      const waiting=Math.max(0,total-completed-active); const remaining=Math.max(0,total-completed); const stateLabel=combining?'combine':(remaining?'chunking':'chunks done');
+      const warning=doc.straggler?'<span class="chunk-warning">STRAGGLER</span>':'';
+      const retryText=retry?`<span class="chunk-retry">${retry} retr${retry===1?'y':'ies'}${doc.last_retry_reason?` · ${escapeHtml(String(doc.last_retry_reason).replaceAll('_',' '))}`:''}</span>`:'<span>no retries</span>';
+      return `<div class="chunk-doc-card"><div class="chunk-doc-head"><div class="chunk-doc-title"><strong title="${escapeHtml(doc.filename||'long document')}">${escapeHtml(doc.filename||'long document')}</strong><span>${escapeHtml(doc.ticker||'')} · ${warning} exact chunk progress</span></div><span class="chunk-doc-state">${escapeHtml(stateLabel)}</span></div><div class="chunk-doc-meta"><span>${label} · ${exactPct}% exact</span><span>${completed} complete · ${active} generating · ${waiting} waiting</span><span>chunk cap ${Number(doc.chunk_concurrency||1)}</span><span>${Number(doc.characters||0).toLocaleString()} chars</span>${retryText}<span>${total>1?(combining?'combine active':'combine pending'):'no combine'}</span></div><div class="bar ${combining?'chunk-combine':'chunk-exact'}"><i style="width:${barPct}%"></i></div></div>`;
+    }).join('');
+    const requestHtml=requests.map(req=>{
+      const now=Date.now(), elapsed=Math.max(0,(now-(req.startedMs||now))/1000);
+      const progress=requestProgress(req,elapsed), stats=requestLatencyStats(req.schema);
+      const title=req.filename || req.ticker || requestStageLabel(req.schema,req.job_stage);
+      const subtitle=[req.ticker,requestStageLabel(req.schema,req.job_stage),req.chunk_count?`chunk ${Number(req.chunk_index||0)+1}/${req.chunk_count}`:null].filter(Boolean).join(' · ');
+      const chars=Number(req.characters_received||0), chunks=Number(req.chunks_received||0);
+      const streamNote=chars?`${chars.toLocaleString()} chars · ${chunks} chunks received`:null;
+      const bucketLabel=String(stats.key||'').includes(':chunk:large')?'large chunk ':'';
+      const latencyNote=stats.samples?`${bucketLabel}p50 ${Math.round(stats.p50)}s · p90 ${Math.round(stats.p90)}s`:`provider avg ${Math.round(stats.avg)}s`;
+      const progressLabel=progress.cls==='estimated'?`EST. ${Math.round(progress.pct)}% · ${progress.label}`:progress.label;
+      return `<div class="llm-request-card"><div class="llm-request-head"><div class="llm-request-title"><strong title="${escapeHtml(title)}">${escapeHtml(title)}</strong><span>${escapeHtml(subtitle)}</span></div><span class="llm-state">${escapeHtml(String(req.state||'queued').replaceAll('_',' '))}</span></div><div class="llm-request-meta"><span>elapsed ${formatElapsed(elapsed)}</span><span>attempt ${Number(req.attempt||1)}</span><span>${Number(req.prompt_characters||0).toLocaleString()} prompt chars</span><span>output cap ${Number(req.max_tokens||0).toLocaleString()}</span><span>${escapeHtml(req.provider||'OpenRouter')}</span><span title="${escapeHtml(req.model||'')}">${escapeHtml(req.model||'model')}</span></div><div class="llm-progress-line"><strong>${escapeHtml(progressLabel)}</strong><span class="llm-estimate">${escapeHtml(streamNote||latencyNote)}</span></div><div class="bar ${progress.cls}"><i style="width:${progress.pct}%"></i></div></div>`;
+    }).join('');
+    const taskHtml=tasks.map(([id,t]) => {
+      const total = Number(t.total), completed = Number(t.completed || 0);
+      const determinate = Number.isFinite(total) && total > 0;
+      const pct = determinate ? Math.min(100, Math.max(0, completed / total * 100)) : 0;
+      const count = determinate ? `${Math.floor(completed)}/${Math.floor(total)}` : `${Math.floor(completed)}`;
+      const isCompany=(t.description||'').includes('Building company-window summaries');
+      const companyNote=isCompany && state.companyCache.eligible ? `${state.companyCache.rebuilding||0} LLM rebuild · ${state.companyCache.cache_hits||0} cached · ${state.companyCache.promoted_single||0} promoted · ${state.companyCache.skipped_no_evidence||0} no evidence` : '';
+      return `<div class="task"><div class="task-top"><span class="task-name" title="${escapeHtml(t.description)}">${escapeHtml(t.description)}${companyNote?` · ${escapeHtml(companyNote)}`:''}</span><span class="task-count">${count}</span></div><div class="bar ${determinate ? '' : 'indeterminate'}"><i style="width:${determinate ? pct : 36}%"></i></div></div>`;
+    }).join('');
+    el.innerHTML=summary+documentHtml+requestHtml+taskHtml;
+    renderMetrics();
+  }
+  const meaningful = (e) => {
+    if (e.level === 'ERROR' || e.level === 'WARNING') return true;
+    if (e.stage === 'cache' || (e.stage === 'extract' && e.message === 'PDF page extracted')) return false;
+    if (e.stage === 'browser' && /network response|network request failed/.test(e.message)) return false;
+    if (e.stage === 'llm-chunk') return /plan|combine|failed/.test(e.message);
+    return ['run','idx','browser','announcement','parallel','llm','llm-document','llm-announcement','llm-company','reduce-cached','download','extract','export','timing','observatory','company-cache','network','stock-master'].includes(e.stage);
+  };
+  function addLog(e) {
+    if (!meaningful(e)) return;
+    state.logs.push(e); if (state.logs.length > 80) state.logs.shift();
+    const el = $('timeline');
+    el.innerHTML = state.logs.slice().reverse().map(item => `<div class="log ${String(item.level || '').toLowerCase()}"><time>${escapeHtml(localClock(item.timestamp))}</time><i class="log-dot"></i><div><span class="log-stage">${escapeHtml(item.stage)}</span>${escapeHtml(item.message)}</div></div>`).join('');
+    $('eventCount').textContent = `${state.logs.length} events`;
+  }
+  function handleEvent(e) {
+    if (e.seq && state.seenSeq.has(e.seq)) return;
+    if (e.seq) state.seenSeq.add(e.seq);
+    if (e.type === 'event' && e.stage === 'llm-request') {
+      const f=e.fields||{}, id=f.request_id;
+      if(id){
+        const prev=state.llmRequests.get(id)||{};
+        const next={...prev,...f,message:e.message,updatedMs:Date.now()};
+        if(!next.startedMs) next.startedMs=Date.parse(e.timestamp)||Date.now();
+        if(f.state==='completed'||f.state==='failed'){
+          const elapsed=Number(f.elapsed_seconds||0);
+          if(f.state==='completed'&&elapsed>0){ const key=requestLatencyKey(next); (state.requestLatency[key] ||= []).push(elapsed); if(state.requestLatency[key].length>20) state.requestLatency[key].shift(); const schemaKey=next.schema||'unknown'; if(schemaKey!==key){(state.requestLatency[schemaKey] ||= []).push(elapsed); if(state.requestLatency[schemaKey].length>20) state.requestLatency[schemaKey].shift();} }
+          state.llmRequests.delete(id);
+        } else state.llmRequests.set(id,next);
+        renderTasks();
+      }
+    }
+    if (e.type === 'event' && e.stage === 'llm-chunk') {
+      const f=e.fields||{}; const key=f.attachment_url || `${f.announcement_id||''}::${f.filename||''}`;
+      if(key){
+        const prev=state.documentChunks.get(key)||{completed:new Set(),active:new Set(),retries:0};
+        const doc={...prev,...f}; if(!(doc.completed instanceof Set)) doc.completed=new Set(); if(!(doc.active instanceof Set)) doc.active=new Set();
+        const idx=Number(f.chunk_index||0);
+        if(e.message==='document chunk plan'){ doc.completed=new Set((f.cached_chunk_indexes||[]).map(Number)); doc.active=new Set(); doc.combine_state='pending'; }
+        if(e.message==='document chunk checkpoint hit'&&idx) doc.completed.add(idx);
+        if(e.message==='document chunk started'&&idx) doc.active.add(idx);
+        if(e.message==='document chunk completed'&&idx){doc.active.delete(idx);doc.completed.add(idx);} if(e.message==='document chunk failed'&&idx){doc.active.delete(idx);doc.last_retry_reason='final chunk failure';}
+        if(e.message==='document combine started') doc.combine_state='active';
+        if(e.message==='document combine completed') doc.combine_state='completed';
+        state.documentChunks.set(key,doc); renderTasks(); renderObservatory();
+      }
+    }
+    if (e.type === 'task') {
+      if ((e.description||'').includes('Building company-window summaries')) {
+        state.pipeline.companyTotal=Number(e.total||state.pipeline.companyTotal||0);
+        state.pipeline.companyCompleted=Number(e.completed||0);
+        if(!state.pipeline.companyStartedAt) state.pipeline.companyStartedAt=Date.parse(e.timestamp)||Date.now();
+      }
+      if (e.action === 'finish') state.tasks.delete(e.task_id); else state.tasks.set(e.task_id, e);
+      renderTasks(); renderObservatory(); return;
+    }
+    if (e.type === 'run_state') {
+      state.status = e.status;
+      const activeProfile=state.profiles.find(p=>p.id===state.activeProfileId);
+      if($('deleteProfileButton')) $('deleteProfileButton').disabled=!activeProfile || activeProfile.id==='main' || Boolean(activeProfile.legacy) || e.status==='running' || e.status==='queued';
+      if (e.status === 'running') {
+        setConnection('running','Running');
+        $('heroTitle').textContent = 'Pipeline in motion.';
+        $('heroCopy').textContent = 'IDX metadata, attachment preparation, parallel summaries, and the company reducer are reporting live.';
+        $('elapsedLabel').textContent = 'elapsed'; renderActiveRun();
+      } else if (e.status === 'completed' || e.status === 'partial') {
+        state.finishedAt = Date.now(); setConnection(e.status === 'partial' ? 'failed' : 'completed', e.status === 'partial' ? 'Partial' : 'Complete');
+        $('heroTitle').textContent = e.status === 'partial' ? 'Run checkpointed.' : 'Digest complete.';
+        $('heroCopy').textContent = e.status === 'partial' ? 'The network interrupted the run, but completed summaries were preserved below. Resume uses the cache.' : 'Validated output is ready below, with the slowest stages and diagnostic artifacts.';
+        $('elapsedLabel').textContent = 'total runtime'; $('runButton').disabled = false; $('finishCachedButton').disabled = false; $('refineFinancialsButton').disabled = false;
+        state.llmRequests.clear(); state.documentChunks.clear(); state.report = e.report || state.report; state.summaries = e.summaries || state.summaries; state.partialSummaries = e.partial_summaries || state.partialSummaries;
+        $('resumeButton').hidden = e.status !== 'partial'; renderActiveRun();
+        renderResult(); renderMetrics(); renderSlow(); renderArtifacts(); refreshLibrary(true);
+      } else if (e.status === 'failed' || e.status === 'interrupted') {
+        state.finishedAt = Date.now(); state.errors += 1; setConnection('failed', e.status === 'interrupted' ? 'Interrupted' : 'Failed');
+        $('heroTitle').textContent = 'Run stopped.'; $('heroCopy').textContent = e.error || 'The pipeline reported an error. Any committed summaries remain recoverable.';
+        state.llmRequests.clear(); state.documentChunks.clear(); state.report = e.report || state.report; state.summaries = e.summaries || state.summaries; state.partialSummaries = e.partial_summaries || state.partialSummaries;
+        $('runButton').disabled = false; $('finishCachedButton').disabled = false; $('refineFinancialsButton').disabled = false; $('resumeButton').hidden = false; renderActiveRun(); toast(e.error || 'Run stopped', true); renderResult(); renderArtifacts(); renderMetrics();
+      }
+      return;
+    }
+    if (e.type === 'event') {
+      const fields = e.fields || {};
+      if (e.stage === 'browser' && e.message === 'IDX rate limited; cooling down before retry') {
+        const cooldown=Math.max(1,Number(fields.cooldown_seconds||0));
+        state.idxRateLimitUntil=Date.now()+cooldown*1000;
+        $('networkState').textContent=`IDX RATE LIMITED · ${Math.ceil(cooldown)}s`;
+        $('networkState').className='network-state throttled';
+        $('heroTitle').textContent='IDX is rate limiting metadata requests.';
+        $('heroCopy').textContent='The scraper is cooling down automatically. Do not restart the run; cached work is safe and retry pacing is active.';
+      }
+      if (e.stage === 'browser' && e.message === 'IDX JSON accepted' && state.idxRateLimitUntil) {
+        state.idxRateLimitUntil=0;
+        $('networkState').textContent='IDX ONLINE';
+        $('networkState').className='network-state online';
+        if(state.status==='running'){ $('heroTitle').textContent='Pipeline in motion.'; $('heroCopy').textContent='IDX metadata recovered and the pipeline is continuing with paced requests.'; }
+      }
+      if (e.stage === 'idx' && e.message === 'incremental window already covered; no metadata request needed') {
+        $('heroTitle').textContent='Archive already up to date.';
+        $('heroCopy').textContent=`The entire requested interval ${fields.requested_start||''} → ${fields.requested_end||''} is already covered. No metadata, attachment, or OpenRouter work is needed.`;
+      }
+      if (e.stage === 'idx' && e.message === 'incremental coverage gaps planned') {
+        const gaps=Array.isArray(fields.missing_ranges)?fields.missing_ranges.length:0;
+        $('heroTitle').textContent=gaps===1?'One uncovered interval found.':`${gaps} uncovered intervals found.`;
+        $('heroCopy').textContent='Only the missing metadata gaps will be queried; covered dates remain cached.';
+      }
+      if (e.stage === 'idx' && e.message === 'future portion deferred until it can be polled') {
+        $('heroTitle').textContent='Current-time coverage stays open.';
+        $('heroCopy').textContent=`Coverage stops at the poll snapshot ${fields.poll_snapshot||''}. A later rerun will collect disclosures published after that point.`;
+      }
+      if (e.stage === 'idx' && /metadata collection (complete|partial)/.test(e.message)) {
+        state.pipeline.metadataTotal = Number(fields.scheduled_announcements || fields.collected_announcements || 0);
+        state.pipeline.metadataExpected = Number(fields.reported_announcements || state.pipeline.metadataTotal || 0);
+        state.pipeline.metadataPartial = e.message.includes('partial') || fields.all_pages_collected===false;
+        state.pipeline.metadataNoop = Boolean(fields.metadata_noop);
+      }
+      if (e.stage === 'idx' && e.message === 'incremental window already covered; no metadata request needed') { state.pipeline.metadataNoop=true; state.pipeline.metadataTotal=0; state.pipeline.metadataExpected=0; }
+      if (e.stage === 'scheduler') { state.pipeline.llmActive=Number(fields.active ?? state.pipeline.llmActive); state.pipeline.llmPending=Number(fields.queue_depth ?? state.pipeline.llmPending); state.pipeline.llmLimit=Number(fields.global_limit ?? state.pipeline.llmLimit); }
+      if (e.stage === 'extract-queue') { state.pipeline.extractActive=Number(fields.active ?? state.pipeline.extractActive); state.pipeline.extractPending=Number(fields.queue_depth ?? state.pipeline.extractPending); state.pipeline.extractWorkers=Number(fields.workers ?? state.pipeline.extractWorkers); state.pipeline.extractBacklog=Number(fields.backlog_limit ?? fields.limit ?? state.pipeline.extractBacklog); }
+      if (e.stage === 'provider-gate') { state.pipeline.providerActive=Number(fields.active ?? state.pipeline.providerActive); state.pipeline.providerLimit=Number(fields.current_limit ?? fields.new_limit ?? state.pipeline.providerLimit); state.pipeline.providerConfigured=Number(fields.configured_max ?? state.pipeline.providerConfigured); if(fields.average_latency_seconds!==undefined) state.pipeline.providerLatency=Number(fields.average_latency_seconds); }
+      if ((e.stage === 'llm-announcement' && e.message === 'announcement summary stored') || (e.stage === 'llm-routine' && e.message === 'routine direct announcement summary stored') || (e.stage === 'cache' && /announcement summary cache hit/.test(e.message))) markAnnouncementComplete(fields.id || fields.announcement_id);
+      if (e.stage === 'observatory' && e.message === 'pipeline performance summary') { $('advisorBottleneck').textContent=`Observed bottleneck: ${String(fields.bottleneck||'balanced').replaceAll('-',' ')}`; }
+      if (e.stage === 'llm' && e.message === 'summary request failed; retrying' && Number(fields.chunk_count||0)>1) { const key=fields.attachment_url || `${fields.announcement_id||''}::${fields.filename||''}`; const doc=state.documentChunks.get(key); if(doc){doc.retries=Number(doc.retries||0)+1;doc.last_retry_reason=fields.retry_reason||'retry';state.documentChunks.set(key,doc);renderTasks();} }
+      if (e.stage === 'llm-document' && e.message === 'document summary stored') { for (const [key,doc] of state.documentChunks.entries()) { if ((fields.attachment_url && doc.attachment_url===fields.attachment_url) || (doc.announcement_id===fields.announcement_id && doc.filename===fields.filename)) state.documentChunks.delete(key); } renderTasks(); renderObservatory(); }
+      if (e.stage === 'cache' && /cache hit/.test(e.message)) state.cacheHits += 1;
+      if (e.stage === 'company-cache') {
+        if(e.message==='company summary cache hit'){state.companyCache.cache_hits++; state.cacheHits++; if(fields.summary){state.summaries[fields.ticker]=fields.summary; renderResult();}}
+        if(e.message==='company skipped before scheduler; no valid announcement summaries') state.companyCache.skipped_no_evidence++;
+        if(e.message==='company reducer plan ready' || e.message==='company reducer scope resolved') { state.companyCache={...state.companyCache,...fields}; state.pipeline.companyTotal=Number(fields.total_companies||state.pipeline.companyTotal||0); }
+      }
+      if (e.stage === 'llm-company' && (e.message==='company-window summary stored' || e.message==='single announcement promoted without extra LLM call' || e.message==='cached company summary stored') && fields.ticker && fields.summary) {
+        state.summaries[fields.ticker]=fields.summary; if(e.message.startsWith('single')) state.companyCache.promoted_single++; renderResult();
+      }
+      if (e.stage === 'network' && state.idxRateLimitUntil <= Date.now()) {
+        const offline=/offline|degraded/i.test(e.message) && !/restored/i.test(e.message); $('networkState').textContent=offline?'NETWORK OFFLINE':'NETWORK ONLINE'; $('networkState').className=`network-state ${offline?'offline':'online'}`;
+      }
+      if (e.level === 'ERROR') state.errors += 1;
+      if (e.stage === 'announcement' && /processing|preparing/.test(e.message) && fields.id) state.announcementIds.add(fields.id);
+      if (e.stage === 'parallel' && e.message === 'document summary batch started') $('workerLabel').textContent = `${fields.workers || 1} LLM workers`;
+      if (e.stage === 'reduce-cached' && e.message === 'cached company reduction started') $('workerLabel').textContent = `${fields.workers || 1} company reducers`;
+      addLog(e); renderMetrics(); renderObservatory();
+    }
+  }
+  function openEvents(runId, cursor=0) {
+    if (state.source) state.source.close();
+    const source = new EventSource(`/api/runs/${runId}/events?cursor=${cursor}`);
+    state.source = source;
+    source.addEventListener('update', ev => { try { handleEvent(JSON.parse(ev.data)); } catch (_) {} });
+    source.addEventListener('done', ev => { source.close(); try { hydrateRun(JSON.parse(ev.data)); } catch (_) {} });
+    source.onerror = () => { if (state.status === 'running') setConnection('running','Reconnecting'); };
+  }
+  async function hydrateRun(snapshot) {
+    if (snapshot.request) { state.resultContext = {start:snapshot.request.start, end:snapshot.request.end, ticker:snapshot.request.ticker || null}; state.activeRequest=snapshot.request; }
+    state.status = snapshot.status; state.report = snapshot.report; state.summaries = snapshot.summaries || {}; state.partialSummaries = snapshot.partial_summaries || {}; state.artifacts = snapshot.artifacts || [];
+    state.startedAt = snapshot.started_at ? new Date(snapshot.started_at).getTime() : state.startedAt;
+    state.finishedAt = snapshot.finished_at ? new Date(snapshot.finished_at).getTime() : state.finishedAt;
+    if (snapshot.status === 'completed') { setConnection('completed','Complete'); $('runButton').disabled = false; $('finishCachedButton').disabled = false; $('refineFinancialsButton').disabled = false; $('resumeButton').hidden = true; renderResult(); renderSlow(); renderArtifacts(); }
+    if (snapshot.status === 'partial' || snapshot.status === 'interrupted' || snapshot.status === 'failed') { $('finishCachedButton').disabled = false; $('refineFinancialsButton').disabled = false; setConnection('failed', snapshot.status === 'partial' ? 'Partial' : (snapshot.status === 'interrupted' ? 'Interrupted' : 'Failed')); $('runButton').disabled = false; $('resumeButton').hidden = false; renderResult(); renderSlow(); renderArtifacts(); }
+    renderActiveRun(); renderMetrics(); renderObservatory();
+  }
+  function renderTickerTabs(tickers) {
+    $('tickerTabs').innerHTML = tickers.map(t => `<button class="tab ${state.activeTicker === t ? 'active' : ''}" data-company-ticker="${escapeHtml(t)}">${escapeHtml(t)}</button>`).join('');
+    $('tickerTabs').querySelectorAll('[data-company-ticker]').forEach(btn => btn.onclick = () => { state.activeTicker = btn.dataset.companyTicker; renderResult(); });
+    $('inspectButton').disabled = !state.activeTicker;
+  }
+
+  function summaryTabs() { return ['overview','timeline','material_changes','key_financial_figures','corporate_actions','expansion_projects','management_or_control_changes','capital_structure_events','listing_or_regulatory_events','analytical_scenarios','risks_or_uncertainties','items_to_monitor','limitations','raw']; }
+  function renderTabs() {
+    const labels = {overview:'Overview', timeline:'Timeline', material_changes:'Material changes', key_financial_figures:'Financial figures', corporate_actions:'Corporate actions', expansion_projects:'Expansion', management_or_control_changes:'Management', capital_structure_events:'Capital structure', listing_or_regulatory_events:'Listing & regulation', analytical_scenarios:'Scenarios', risks_or_uncertainties:'Risks', items_to_monitor:'Monitor', limitations:'Limitations', raw:'Raw JSON'};
+    $('tabs').innerHTML = summaryTabs().map(tab => `<button class="tab ${state.activeTab === tab ? 'active' : ''}" data-tab="${tab}">${labels[tab]}</button>`).join('');
+    $('tabs').querySelectorAll('.tab').forEach(btn => btn.onclick = () => { state.activeTab = btn.dataset.tab; renderResult(); });
+  }
+  function renderPartialResult() {
+    const tickers = Object.keys(state.partialSummaries || {});
+    if (!tickers.length) { $('tabs').innerHTML = ''; $('resultBody').innerHTML = `<div class="empty">No committed announcement summary was found for this window.</div>`; return; }
+    if (!state.activeTicker || !state.partialSummaries[state.activeTicker]) state.activeTicker = tickers[0];
+    renderTickerTabs(tickers);
+    $('tabs').innerHTML = '';
+    const records = state.partialSummaries[state.activeTicker] || [];
+    $('resultBody').innerHTML = `<div class="overview" style="margin-bottom:14px"><b>Recovered checkpoint:</b> ${records.length} announcement-level summaries were committed before the run stopped. These are usable now; resume later to finish missing documents and company reducers.</div><div class="result-grid">${records.map(r => { const x=r.summary||{}; return `<div class="result-card"><strong>${escapeHtml(r.title || r.announcement_id || '')}</strong><p>${escapeHtml(r.announced_at || '')}</p><p style="margin-top:8px">${escapeHtml(x.executive_summary || x.summary || 'Structured summary saved')}</p></div>`; }).join('')}</div>`;
+  }
+  function renderResult() {
+    const tickers = Object.keys(state.summaries || {});
+    if (!tickers.length) {
+      if (Object.keys(state.partialSummaries || {}).length) { renderPartialResult(); return; }
+      $('tickerTabs').innerHTML = ''; $('tabs').innerHTML = ''; $('inspectButton').disabled = true; $('resultBody').innerHTML = `<div class="empty">${['completed','partial','failed','interrupted'].includes(state.status) ? 'No committed summary was found for this window.' : 'Waiting for validated summaries.'}</div>`; return;
+    }
+    if (!state.activeTicker || !state.summaries[state.activeTicker]) state.activeTicker = tickers[0];
+    renderTickerTabs(tickers);
+    const s = state.summaries[state.activeTicker]; renderTabs();
+    let html = '';
+    if (state.activeTab === 'overview') html = `<div class="overview">${escapeHtml(s.overview || 'No overview')}</div>`;
+    else if (state.activeTab === 'timeline') html = `<div class="result-grid">${(s.timeline || []).map(x => `<div class="result-card"><strong>${escapeHtml(x.title || '')}</strong><p>${escapeHtml(x.announced_at || '')}</p><p style="margin-top:7px">${escapeHtml(x.summary || '')}</p></div>`).join('') || '<div class="empty">No timeline items.</div>'}</div>`;
+    else if (state.activeTab === 'key_financial_figures') html = `<div class="result-grid">${(s.key_financial_figures || []).map(x => `<div class="result-card"><strong>${escapeHtml(x.metric || '')}</strong><p>${escapeHtml(x.value || '')}${x.period ? ' · ' + escapeHtml(x.period) : ''}</p></div>`).join('') || '<div class="empty">No explicit financial figures.</div>'}</div>`;
+    else if (state.activeTab === 'analytical_scenarios') html = renderScenarioCards(s.analytical_scenarios || []);
+    else if (state.activeTab === 'raw') html = `<pre>${escapeHtml(JSON.stringify(s, null, 2))}</pre>`;
+    else { const arr = s[state.activeTab] || []; html = `<div class="chips">${arr.map(x => `<span class="chip">${escapeHtml(x)}</span>`).join('') || '<div class="empty">No items in this section.</div>'}</div>`; }
+    $('resultBody').innerHTML = html;
+  }
+  function renderSlow() {
+    const slow = state.report?.diagnostics?.slowest_stages || [];
+    if (!slow.length) { $('slowPanel').hidden = true; return; }
+    $('slowPanel').hidden = false;
+    const max = Math.max(...slow.map(x => Number(x.elapsed_seconds) || 0), 1);
+    $('slowList').innerHTML = slow.map(x => `<div class="slow-row"><div><div class="slow-name" title="${escapeHtml(x.label)}">${escapeHtml(x.stage)} · ${escapeHtml(x.label)}</div><div class="bar"><i style="width:${Math.max(3, (Number(x.elapsed_seconds)||0)/max*100)}%"></i></div></div><div class="slow-time">${Number(x.elapsed_seconds || 0).toFixed(2)}s</div></div>`).join('');
+  }
+  function renderArtifacts() {
+    if (!state.runId || !state.report) return;
+    const d = state.report.diagnostics || {}; const links = [`<a class="link-btn" href="/api/runs/${state.runId}/artifacts/report">Report</a>`];
+    if ((state.artifacts || []).includes('stream')) links.push(`<a class="link-btn" href="/api/runs/${state.runId}/artifacts/stream">Stream JSONL</a>`);
+    if (d.log_file) links.push(`<a class="link-btn" href="/api/runs/${state.runId}/artifacts/log">JSONL log</a>`);
+    if (d.browser_trace) links.push(`<a class="link-btn" href="/api/runs/${state.runId}/artifacts/trace">Browser trace</a>`);
+    if (d.prompt_hashes || (state.artifacts || []).includes('prompts')) links.push(`<a class="link-btn" href="/api/runs/${state.runId}/artifacts/prompts">Prompts used</a>`);
+    if ((state.artifacts || []).includes('share_md')) links.push(`<a class="link-btn" href="/api/runs/${state.runId}/artifacts/share_md">All companies MD</a>`);
+    if ((state.artifacts || []).includes('share_txt')) links.push(`<a class="link-btn" href="/api/runs/${state.runId}/artifacts/share_txt">All companies TXT</a>`);
+    if ((state.artifacts || []).includes('recovery') || state.report?.recovery) links.push(`<a class="link-btn" href="/api/runs/${state.runId}/artifacts/recovery">Recovery JSON</a>`);
+    $('artifactLinks').innerHTML = links.join('');
+  }
+  const AUDIT_TAB_LABELS = {summary:'Summary', process:'Process', prompts:'Prompt → output', sources:'Claims & sources', announcements:'Announcements'};
+  function auditBadge(text, cls='') { return `<span class="audit-badge ${cls}">${escapeHtml(text || '')}</span>`; }
+  function fmtAuditTime(value) { if (!value) return '—'; try { return new Date(value).toLocaleString(); } catch { return value; } }
+  function sourceFileLink(url, filename, kind='file') { if (!url) return ''; const label = kind === 'text' ? 'Extracted text' : (filename || 'Open attachment'); return `<a class="source-link" target="_blank" rel="noopener" href="/api/source-file?kind=${kind}&url=${encodeURIComponent(url)}">${escapeHtml(label)}</a>`; }
+  function renderAuditTabs() {
+    $('auditTabs').innerHTML = Object.entries(AUDIT_TAB_LABELS).map(([key,label]) => `<button class="tab ${state.auditTab===key?'active':''}" data-audit-tab="${key}">${label}</button>`).join('');
+    $('auditTabs').querySelectorAll('[data-audit-tab]').forEach(btn => btn.onclick = () => { state.auditTab = btn.dataset.auditTab; renderAuditBody(); });
+  }
+  function renderAuditSummary(d) {
+    const s = d.company_summary || {};
+    const m = d.company_metadata || {};
+    return `<div class="overview" style="margin-bottom:14px">${escapeHtml(s.overview || 'No completed company overview. Announcement checkpoints are still inspectable.')}</div>
+      <div class="audit-grid">
+        <div class="audit-card"><h4>Company checkpoint</h4><p>${escapeHtml(d.ticker)} · ${escapeHtml(d.start_at)} → ${escapeHtml(d.end_at)}</p><div class="audit-meta">${auditBadge(`${s.announcement_count || d.announcements?.length || 0} announcements`)}${auditBadge(m.model || 'model unavailable')}${auditBadge(m.prompt_version || 'prompt version unavailable')}</div><p>Stored: ${escapeHtml(fmtAuditTime(m.updated_at))}</p></div>
+        <div class="audit-card"><h4>Source inventory</h4><p>${(d.announcements||[]).length} announcements · ${(d.announcements||[]).reduce((n,a)=>n+(a.attachments||[]).length,0)} attachments · ${(d.llm_audits||[]).length} exact LLM audit records.</p><div class="audit-meta">${auditBadge(d.company_prompt?.status || 'no prompt audit', d.company_prompt?.status==='exact_audit'?'exact':'')}</div></div>
+      </div><div style="margin-top:12px"><pre>${escapeHtml(JSON.stringify(s, null, 2))}</pre></div>`;
+  }
+  function renderAuditProcess(d) {
+    const rows = d.process_timeline || [];
+    return rows.length ? `<div>${rows.map(x => `<div class="audit-step"><time>${escapeHtml(fmtAuditTime(x.time))}${x.end_time ? `<br>→ ${escapeHtml(fmtAuditTime(x.end_time))}`:''}</time><div><strong>${escapeHtml(x.stage || '')}</strong><span>${escapeHtml(x.label || '')}${x.announcement_id ? ` · ${escapeHtml(x.announcement_id)}`:''}</span></div><div>${x.elapsed_seconds != null ? auditBadge(`${Number(x.elapsed_seconds).toFixed(2)}s`) : ''}${x.status ? auditBadge(x.status, x.status==='succeeded'?'exact':'') : ''}</div></div>`).join('')}</div>` : '<div class="empty">No process checkpoints found.</div>';
+  }
+  async function loadExactAudit(id) {
+    if (state.loadedAudits[id]) return state.loadedAudits[id];
+    const res = await fetch(`/api/llm-audit/${id}`); const body = await res.json(); if (!res.ok) throw new Error(body.detail || 'Audit could not be loaded'); state.loadedAudits[id]=body; return body;
+  }
+  function promptAuditDetails(a) {
+    const loaded = state.loadedAudits[a.audit_id];
+    if (!loaded) return `<div class="audit-details-body"><button class="secondary" data-load-audit="${a.audit_id}" type="button">Load exact prompt & output</button></div>`;
+    return `<div class="audit-details-body"><div class="prompt-block"><h5>System prompt</h5><pre>${escapeHtml(loaded.system_prompt || '')}</pre></div><div class="prompt-block"><h5>User prompt / input sent to model</h5><pre>${escapeHtml(loaded.user_prompt || '')}</pre></div><div class="prompt-block"><h5>Raw model response</h5><pre>${escapeHtml(loaded.raw_response || '')}</pre></div></div>`;
+  }
+  function renderAuditPrompts(d) {
+    const audits = d.llm_audits || [];
+    let html = '';
+    if (!audits.length) {
+      const p = d.company_prompt || {};
+      html += `<div class="audit-notice">${escapeHtml(p.notice || 'This historical run predates exact prompt auditing. The viewer can reconstruct the saved input path, but cannot claim the raw historical request was persisted.')}</div>`;
+      html += `<details class="audit-details" open><summary><span>Company prompt reconstruction</span>${auditBadge(p.status || 'reconstructed')}</summary><div class="audit-details-body"><div class="prompt-block"><h5>System / guardrails</h5><pre>${escapeHtml(p.system_prompt || '')}</pre></div><div class="prompt-block"><h5>Reconstructed user prompt</h5><pre>${escapeHtml(p.user_prompt || '')}</pre></div><div class="prompt-block"><h5>Saved output</h5><pre>${escapeHtml(p.raw_response || '')}</pre></div></div></details>`;
+      return html;
+    }
+    html += audits.slice().reverse().map(a => `<details class="audit-details"><summary><span>${escapeHtml(a.stage || a.schema_name)} · ${escapeHtml(a.filename || a.announcement_id || d.ticker)}</span><span>${escapeHtml(fmtAuditTime(a.started_at))} · ${Number(a.elapsed_seconds||0).toFixed(2)}s · ${(a.prompt_tokens||0)}→${(a.completion_tokens||0)} tok</span></summary>${promptAuditDetails(a)}</details>`).join('');
+    setTimeout(() => document.querySelectorAll('[data-load-audit]').forEach(btn => btn.onclick = async () => { try { btn.disabled=true; await loadExactAudit(btn.dataset.loadAudit); renderAuditBody(); } catch(err){toast(err.message,true);} }), 0);
+    return html;
+  }
+  function renderAuditSources(d) {
+    const traces = d.claim_traces || [];
+    if (!traces.length) return '<div class="empty">No structured claims to trace.</div>';
+    return `<div class="audit-grid">${traces.map(t => { const cls=t.attribution==='exact_model_reference'?'exact':(t.attribution?.startsWith('inferred')?'inferred':''); return `<div class="audit-card"><h4>${escapeHtml(t.claim)}</h4><div class="audit-meta">${auditBadge(t.category)}${auditBadge(t.classification)}${auditBadge(t.attribution,cls)}${t.match_score!=null?auditBadge(`match ${(t.match_score*100).toFixed(0)}%`):''}</div>${t.rationale?`<p>${escapeHtml(t.rationale)}</p>`:''}${(t.sources||[]).map(src => `<div class="source-row"><p><strong>${escapeHtml(src.title || src.announcement_id)}</strong><br>${escapeHtml(src.announced_at || '')}</p><div class="source-links">${(src.attachments||[]).map(a => sourceFileLink(a.url, `${a.is_attachment?'Supporting':'Main'} · ${a.filename}`)).join('')}</div></div>`).join('') || '<p>No attachment could be attributed with confidence.</p>'}</div>`; }).join('')}</div>`;
+  }
+  function renderAuditAnnouncements(d) {
+    const anns=d.announcements||[]; if(!anns.length) return '<div class="empty">No announcement checkpoints found.</div>';
+    return anns.map(a => `<details class="audit-details"><summary><span>${escapeHtml(a.title || a.id2)}</span><span>${escapeHtml(a.announced_at || '')} · ${(a.attachments||[]).length} files</span></summary><div class="audit-details-body"><div class="audit-meta">${auditBadge(a.summary_analysis_mode || 'full')}${a.summary_triage?.reason?auditBadge('triage recorded'):''}</div>${a.summary_triage?.reason?`<p>${escapeHtml(a.summary_triage.reason)}${(a.summary_triage.signals||[]).length?` · signals: ${escapeHtml(a.summary_triage.signals.join(', '))}`:''}</p>`:''}<div class="prompt-block"><h5>Announcement summary output</h5><pre>${escapeHtml(JSON.stringify(a.announcement_summary || {}, null, 2))}</pre></div>${(a.attachments||[]).map(at => `<div class="audit-card"><h4>${escapeHtml(at.original_filename || '')}</h4><div class="audit-meta">${auditBadge(at.is_attachment?'supporting attachment':'main document')}${auditBadge(at.selected_for_analysis===0?'excluded from analysis':'analysis source',at.selected_for_analysis===0?'inferred':'exact')}${at.selection_category?auditBadge(at.selection_category):''}${auditBadge(at.extraction_method || 'no extraction method')}${at.document_summary_updated_at?auditBadge(`summary ${fmtAuditTime(at.document_summary_updated_at)}`):''}</div>${at.selection_reason?`<p>${escapeHtml(at.selection_reason)}</p>`:''}${at.duplicate_of_url?`<p class="autosave">Duplicate of: ${escapeHtml(at.duplicate_of_url)}</p>`:''}<div class="source-links">${sourceFileLink(at.url, 'Open source file')}${sourceFileLink(at.url, 'Extracted text', 'text')}</div><div style="margin-top:9px"><pre>${escapeHtml(JSON.stringify(at.document_summary || {}, null, 2))}</pre></div>${(at.source_evidence_located||[]).map(ev => `<div class="source-row"><p><strong>${escapeHtml(ev.fact || '')}</strong><br>Evidence: ${escapeHtml(ev.evidence || '')}</p><div class="audit-meta">${ev.locator?.page?auditBadge(`page ${ev.locator.page}`):''}${ev.locator?.sheet?auditBadge(`sheet ${ev.locator.sheet}`):''}${ev.locator?.line?auditBadge(`line ${ev.locator.line}`):''}${auditBadge(ev.locator?.match || 'not located', ev.locator?.match==='exact_text'?'exact':'')}</div></div>`).join('')}</div>`).join('')}</div></details>`).join('');
+  }
+  function renderAuditBody() {
+    const d=state.auditData; if(!d) return; renderAuditTabs();
+    const renderers={summary:renderAuditSummary,process:renderAuditProcess,prompts:renderAuditPrompts,sources:renderAuditSources,announcements:renderAuditAnnouncements};
+    $('auditBody').innerHTML=(renderers[state.auditTab]||renderAuditSummary)(d);
+  }
+  async function openTickerInspector() {
+    if (!state.activeTicker) { toast('Choose a ticker first', true); return; }
+    $('inspectButton').disabled=true;
+    try {
+      const scope=currentResultScope();
+      const payload={start:scope.start,end:scope.end,ticker:state.activeTicker};
+      const res=await fetch('/api/company-detail',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}); const body=await res.json(); if(!res.ok) throw new Error(body.detail||'Could not load ticker detail');
+      state.auditData=body; state.auditTab='summary'; state.loadedAudits={};
+      $('auditModalTitle').textContent=`${body.ticker} · ticker inspector`; $('auditModalMeta').textContent=`${body.start_at} → ${body.end_at} · ${(body.announcements||[]).length} announcements · ${(body.llm_audits||[]).length} exact LLM audits`;
+      renderAuditBody(); $('auditModal').classList.add('open'); $('auditModal').setAttribute('aria-hidden','false');
+    } catch(err){toast(err.message,true);} finally {$('inspectButton').disabled=false;}
+  }
+  function closeTickerInspector(){ $('auditModal').classList.remove('open'); $('auditModal').setAttribute('aria-hidden','true'); }
+
+  async function loadPrompts() {
+    const res = await fetch('/api/prompts');
+    const body = await res.json();
+    if (!res.ok) throw new Error(body.detail || 'Could not load prompts');
+    state.promptData = body;
+    $('promptProfileInput').value = body.profile_name || '';
+    renderPromptEditor();
+  }
+  function renderPromptEditor() {
+    const data = state.promptData; if (!data) return;
+    const keys = Object.keys(data.specs || {});
+    if (!keys.includes(state.activePromptKey)) state.activePromptKey = keys[0] || 'system';
+    $('promptNav').innerHTML = keys.map(key => {
+      const spec = data.specs[key];
+      return `<button class="prompt-tab ${key === state.activePromptKey ? 'active' : ''}" data-key="${key}"><strong>${escapeHtml(spec.label)}</strong><span>${escapeHtml(spec.description)}</span></button>`;
+    }).join('');
+    $('promptNav').querySelectorAll('.prompt-tab').forEach(btn => btn.onclick = () => {
+      state.activePromptKey = btn.dataset.key; renderPromptEditor();
+    });
+    const key = state.activePromptKey, spec = data.specs[key], text = data.prompts[key] || '';
+    $('promptTitle').textContent = spec.label;
+    $('promptText').value = text;
+    $('promptStats').textContent = `${text.length.toLocaleString()} chars · hash ${data.hashes[key]}`;
+    const required = new Set(spec.required_variables || []);
+    $('promptVariables').innerHTML = `<span>Variables:</span>` + ((spec.variables || []).map(v => `<span class="variable">{${escapeHtml(v)}}${required.has(v) ? ' *' : ''}</span>`).join('') || '<span class="variable">none</span>') + (required.size ? '<span>* required</span>' : '');
+    $('promptSave').disabled = state.status === 'running';
+    $('promptReset').disabled = state.status === 'running';
+    $('promptResetAll').disabled = state.status === 'running';
+  }
+  async function openPromptEditor() {
+    try {
+      await loadPrompts();
+      $('promptModal').classList.add('open'); $('promptModal').setAttribute('aria-hidden','false');
+      setTimeout(() => $('promptText').focus(), 20);
+    } catch (err) { toast(err.message, true); }
+  }
+  function closePromptEditor() { $('promptModal').classList.remove('open'); $('promptModal').setAttribute('aria-hidden','true'); }
+  async function savePrompt() {
+    const key = state.activePromptKey;
+    try {
+      const res = await fetch('/api/prompts', {method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify({prompts:{[key]:$('promptText').value}, profile_name:$('promptProfileInput').value.trim()})});
+      const body = await res.json(); if (!res.ok) throw new Error(body.detail || 'Could not save prompt');
+      state.promptData = body; $('promptProfile').textContent = body.profile_name; renderPromptEditor(); toast(`${body.specs[key].label} saved`);
+    } catch (err) { toast(err.message, true); }
+  }
+  async function resetPrompts(keys) {
+    try {
+      const res = await fetch('/api/prompts/reset', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({keys})});
+      const body = await res.json(); if (!res.ok) throw new Error(body.detail || 'Could not reset prompt');
+      state.promptData = body; $('promptProfile').textContent = body.profile_name; $('promptProfileInput').value = body.profile_name; renderPromptEditor(); toast(keys ? 'Prompt layer reset' : 'All prompts reset');
+    } catch (err) { toast(err.message, true); }
+  }
+  function renderScenarioCards(items) {
+    return `<div class="result-grid">${(items || []).map(x => `<div class="result-card scenario-card"><span class="scenario-badge">${escapeHtml(x.classification || '')} · ${escapeHtml(x.confidence || '')}</span><strong>${escapeHtml(x.topic || '')}</strong><p>${escapeHtml(x.analysis || '')}</p>${(x.basis || []).length ? `<p style="margin-top:8px"><b>Basis:</b> ${escapeHtml(x.basis.join(' • '))}</p>` : ''}${(x.assumptions || []).length ? `<p style="margin-top:6px"><b>Assumptions:</b> ${escapeHtml(x.assumptions.join(' • '))}</p>` : ''}${(x.caveats || []).length ? `<p style="margin-top:6px"><b>Caveats:</b> ${escapeHtml(x.caveats.join(' • '))}</p>` : ''}</div>`).join('') || '<div class="empty">No analytical scenarios.</div>'}</div>`;
+  }
+
+  const SHARE_SECTION_SPECS = [
+    ['overview','Overview',true,true,true],
+    ['timeline','Timeline',false,false,true],
+    ['material_changes','Material changes',true,false,true],
+    ['key_financial_figures','Financial figures',true,false,true],
+    ['corporate_actions','Corporate actions',true,true,true],
+    ['expansion_projects','Expansion projects',true,true,true],
+    ['management_or_control_changes','Management / control',true,true,true],
+    ['capital_structure_events','Capital structure',true,true,true],
+    ['listing_or_regulatory_events','Listing / regulatory',true,true,true],
+    ['analytical_scenarios','Analytical scenarios',true,true,true],
+    ['risks_or_uncertainties','Risks / uncertainties',true,false,true],
+    ['items_to_monitor','Items to monitor',true,true,true],
+    ['limitations','Limitations',false,false,true]
+  ];
+  function renderShareSections() {
+    $('shareSections').innerHTML = SHARE_SECTION_SPECS.map(([key,label,friend]) => `<label class="share-check"><input type="checkbox" data-share-section="${key}" ${friend ? 'checked' : ''}><span>${escapeHtml(label)}</span></label>`).join('');
+  }
+  function selectedShareSections() {
+    return [...document.querySelectorAll('[data-share-section]:checked')].map(x => x.dataset.shareSection);
+  }
+  function setSharePreset(name) {
+    const col = name === 'signals' ? 3 : name === 'full' ? 4 : 2;
+    document.querySelectorAll('[data-share-section]').forEach(input => {
+      const spec = SHARE_SECTION_SPECS.find(x => x[0] === input.dataset.shareSection);
+      input.checked = Boolean(spec?.[col]);
+    });
+    [['sharePresetFriend','friend'],['sharePresetSignals','signals'],['sharePresetFull','full']].forEach(([id,preset]) => $(id).classList.toggle('active', preset === name));
+  }
+  function openSharePanel() {
+    if (!$('shareSections').children.length) renderShareSections();
+    setSharePreset('friend');
+    const scope = currentResultScope();
+    const ticker = (scope.ticker || '').toUpperCase();
+    $('shareScope').textContent = `${scope.start || '—'} → ${scope.end || '—'} · ${ticker || 'all saved companies'} · alphabetical ticker order`;
+    $('shareStatus').textContent = 'No cross-company analysis. Saved ticker digests are appended one after another.';
+    $('shareModal').classList.add('open'); $('shareModal').setAttribute('aria-hidden','false');
+  }
+  function closeSharePanel() { $('shareModal').classList.remove('open'); $('shareModal').setAttribute('aria-hidden','true'); }
+  function sharePayload(format) {
+    const sections = selectedShareSections();
+    if (!sections.length) throw new Error('Select at least one section');
+    const scope = currentResultScope();
+    return {start:scope.start, end:scope.end, ticker:(scope.ticker || '').toUpperCase() || null, format, sections, signals_only:false};
+  }
+  async function copyShare() {
+    $('shareCopy').disabled = true;
+    try {
+      const res = await fetch('/api/share/render', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(sharePayload('txt'))});
+      const body = await res.json(); if (!res.ok) throw new Error(body.detail || 'Could not render share text');
+      try { await navigator.clipboard.writeText(body.text); }
+      catch (_) {
+        const area=document.createElement('textarea'); area.value=body.text; area.style.position='fixed'; area.style.opacity='0'; document.body.appendChild(area); area.select(); document.execCommand('copy'); area.remove();
+      }
+      $('shareStatus').textContent = `${body.company_count} companies · ${body.characters.toLocaleString()} characters · 0 LLM calls`;
+      toast(`Copied ${body.company_count} company digests`);
+    } catch (err) { toast(err.message, true); }
+    finally { $('shareCopy').disabled = false; }
+  }
+  async function downloadShare(format) {
+    const button = format === 'md' ? $('shareMd') : $('shareTxt'); button.disabled = true;
+    try {
+      const res = await fetch('/api/share/export', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(sharePayload(format))});
+      if (!res.ok) { const body=await res.json(); throw new Error(body.detail || 'Could not export summaries'); }
+      const blob = await res.blob();
+      const disposition = res.headers.get('content-disposition') || '';
+      const match = disposition.match(/filename="?([^";]+)"?/i);
+      const filename = match?.[1] || `idx-digest-all-companies.${format}`;
+      const url=URL.createObjectURL(blob), a=document.createElement('a'); a.href=url; a.download=filename; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),500);
+      $('shareStatus').textContent = `${(blob.size/1024).toFixed(1)} KiB exported · 0 LLM calls`;
+      toast(`Saved ${format.toUpperCase()} share file`);
+    } catch (err) { toast(err.message, true); }
+    finally { button.disabled = false; }
+  }
+
+  function formPayload() {
+    return {
+      start: $('start').value,
+      end: $('end').value,
+      ticker: $('ticker').value.trim().toUpperCase() || null,
+      keyword: $('keyword').value.trim(),
+      skip_llm: !$('enableLlm').checked,
+      max_announcements: $('maxAnnouncements').value ? Number($('maxAnnouncements').value) : null,
+      llm_concurrency: Number($('concurrency').value),
+      llm_per_announcement_concurrency: Math.min(Number($('perAnnouncementConcurrency').value), Number($('concurrency').value)),
+      llm_document_chunk_concurrency: Math.min(Number($('documentChunkConcurrency').value), Number($('perAnnouncementConcurrency').value), Number($('concurrency').value)),
+      extraction_workers: Number($('extractionWorkers').value),
+      extraction_queue_size: Math.max(Number($('extractionWorkers').value), Number($('extractionQueueSize').value)),
+      trace_browser: $('traceBrowser').checked,
+      browser_headless: $('headless').checked,
+      instrument_scope: $('stockOnly').checked ? 'stocks' : 'all',
+      metadata_mode: $('historicalAudit').checked ? 'historical_audit' : 'incremental',
+      attachment_policy: $('smartAttachments').checked ? 'smart' : 'all_supported',
+      llm_adaptive_concurrency: $('adaptiveLlm').checked,
+      routine_triage_enabled: $('routineTriage').checked,
+      attachment_dedup_enabled: $('safeDedup').checked
+    };
+  }
+  async function finishCachedDigests() {
+    const payload = formPayload();
+    state.resultContext = {start:payload.start,end:payload.end,ticker:payload.ticker};
+    if (payload.skip_llm) { toast('Enable OpenRouter summaries first', true); return; }
+    $('finishCachedButton').disabled = true; $('runButton').disabled = true;
+    resetRunUi(); setConnection('running','Reducing cache');
+    $('heroTitle').textContent = 'Finishing cached company digests.';
+    $('heroCopy').textContent = 'Using committed announcement summaries only. IDX, Chromium, downloads, and extraction are bypassed.';
+    try {
+      const res = await fetch('/api/reduce-cached', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload)});
+      const body = await res.json(); if (!res.ok) throw new Error(body.detail || 'Could not start cached reducer');
+      state.runId = body.run_id; state.status = body.status; state.activeRequest=body.request||payload; state.startedAt = Date.now(); state.finishedAt = null; renderActiveRun();
+      startTimer(); openEvents(state.runId, 0);
+    } catch (err) {
+      $('finishCachedButton').disabled = false; $('runButton').disabled = false; setConnection('failed','Error'); toast(err.message, true);
+    }
+  }
+
+  async function refineFinancials() {
+    const payload = formPayload();
+    state.resultContext = {start:payload.start,end:payload.end,ticker:payload.ticker};
+    if (payload.skip_llm) { toast('Enable OpenRouter summaries first', true); return; }
+    $('refineFinancialsButton').disabled = true; $('runButton').disabled = true;
+    resetRunUi(); setConnection('running','Refining financials');
+    $('heroTitle').textContent = 'Refining cached financial reports.';
+    $('heroCopy').textContent = 'Using local announcement metadata, extracted text, and saved document summaries. Only the XLSX and primary LK/report PDF enter the financial reducer.';
+    try {
+      const res = await fetch('/api/refine-financials', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload)});
+      const body = await res.json(); if (!res.ok) throw new Error(body.detail || 'Could not start financial refinement');
+      state.runId = body.run_id; state.status = body.status; state.activeRequest=body.request||payload; state.startedAt = Date.now(); state.finishedAt = null; renderActiveRun();
+      startTimer(); openEvents(state.runId, 0);
+    } catch (err) {
+      $('refineFinancialsButton').disabled = false; $('runButton').disabled = false; setConnection('failed','Error'); toast(err.message, true);
+    }
+  }
+
+  async function recoverCached() {
+    const recoveryPayload = formPayload();
+    state.resultContext = {start:recoveryPayload.start,end:recoveryPayload.end,ticker:recoveryPayload.ticker};
+    $('recoverButton').disabled = true;
+    try {
+      const res = await fetch('/api/recovery', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(recoveryPayload)});
+      const body = await res.json(); if (!res.ok) throw new Error(body.detail || 'Could not open cached checkpoints');
+      state.runId = null; state.status = 'partial'; state.report = {status:'partial', recovery:body.recovery, diagnostics:{}}; state.summaries = body.summaries || {}; state.partialSummaries = body.partial_summaries || {}; state.artifacts = [];
+      $('heroTitle').textContent = 'Cached checkpoints opened.'; $('heroCopy').textContent = `${body.recovery?.announcement_summary_count || 0} announcement summaries and ${body.recovery?.document_summary_count || 0} document summaries are stored locally.`;
+      $('resumeButton').hidden = true; renderResult(); renderMetrics(); renderArtifacts();
+      if (!Object.keys(state.summaries).length && !Object.keys(state.partialSummaries).length) toast('No cached summary found for this exact window', true); else toast('Cached summaries loaded');
+    } catch (err) { toast(err.message, true); } finally { $('recoverButton').disabled = false; }
+  }
+  async function resumeRun() {
+    if (!state.runId) return;
+    $('resumeButton').disabled = true; $('runButton').disabled = true;
+    try {
+      const res = await fetch(`/api/runs/${state.runId}/resume`, {method:'POST'});
+      const body = await res.json(); if (!res.ok) throw new Error(body.detail || 'Could not resume run');
+      resetRunUi(); state.runId = body.run_id; state.status = body.status; state.activeRequest=body.request||state.activeRequest; state.startedAt = Date.now(); renderActiveRun(); startTimer(); openEvents(body.run_id, 0);
+    } catch (err) { $('resumeButton').disabled = false; $('runButton').disabled = false; toast(err.message, true); }
+  }
+  async function startRun(ev) {
+    ev.preventDefault();
+    const payload = formPayload();
+    state.resultContext = {start:payload.start,end:payload.end,ticker:payload.ticker};
+    $('runButton').disabled = true; resetRunUi(); setConnection('running','Starting');
+    try {
+      const res = await fetch('/api/runs', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload)});
+      const body = await res.json(); if (!res.ok) throw new Error(body.detail || 'Could not start run');
+      state.runId = body.run_id; state.status = body.status; state.activeRequest=body.request||payload; state.startedAt = Date.now(); state.finishedAt = null; renderActiveRun();
+      startTimer(); openEvents(state.runId, 0);
+    } catch (err) { $('runButton').disabled = false; setConnection('failed','Error'); toast(err.message, true); }
+  }
+  function currentResultScope() {
+    if (state.resultContext?.start && state.resultContext?.end) return state.resultContext;
+    return {start:$('start').value, end:$('end').value, ticker:$('ticker').value.trim().toUpperCase() || null};
+  }
+
+  function switchView(name, persist=true) {
+    state.currentView = name;
+    document.querySelectorAll('.workspace-view').forEach(el => el.classList.toggle('active', el.id === `view${name[0].toUpperCase()}${name.slice(1)}`));
+    document.querySelectorAll('[data-view]').forEach(btn => btn.classList.toggle('active', btn.dataset.view === name));
+    if (name === 'library' || name === 'companies' || name === 'activity') refreshLibrary(true);
+    if (persist) scheduleProfileSave();
+  }
+
+  function collectProfileState() {
+    return {
+      start:$('start').value,
+      end:$('end').value,
+      ticker:$('ticker').value.trim().toUpperCase(),
+      keyword:$('keyword').value,
+      max_announcements:$('maxAnnouncements').value || '',
+      llm_concurrency:Number($('concurrency').value),
+      llm_per_announcement_concurrency:Number($('perAnnouncementConcurrency').value),
+      llm_document_chunk_concurrency:Number($('documentChunkConcurrency').value),
+      extraction_workers:Number($('extractionWorkers').value),
+      extraction_queue_size:Number($('extractionQueueSize').value),
+      stock_only:$('stockOnly').checked,
+      historical_audit:$('historicalAudit').checked,
+      smart_attachments:$('smartAttachments').checked,
+      enable_llm:$('enableLlm').checked,
+      adaptive_llm:$('adaptiveLlm').checked,
+      routine_triage:$('routineTriage').checked,
+      safe_dedup:$('safeDedup').checked,
+      trace_browser:$('traceBrowser').checked,
+      headless:$('headless').checked,
+      view:state.currentView,
+      theme:document.documentElement.dataset.theme || 'paper'
+    };
+  }
+
+  function applyProfileState(saved, config) {
+    if (!saved || !Object.keys(saved).length) return;
+    const map = {start:'start',end:'end',ticker:'ticker',keyword:'keyword',max_announcements:'maxAnnouncements'};
+    Object.entries(map).forEach(([key,id]) => { if (saved[key] !== undefined && saved[key] !== null) $(id).value = saved[key]; });
+    if (saved.llm_concurrency) { $('concurrency').value = saved.llm_concurrency; $('concurrencyValue').textContent = saved.llm_concurrency; }
+    const perAnnouncement = saved.llm_per_announcement_concurrency || config?.llm_per_announcement_concurrency;
+    if (perAnnouncement) { $('perAnnouncementConcurrency').value = Math.min(perAnnouncement, Number($('concurrency').value)); $('perAnnouncementConcurrencyValue').textContent = $('perAnnouncementConcurrency').value; }
+    const documentChunks = saved.llm_document_chunk_concurrency || config?.llm_document_chunk_concurrency || 2;
+    $('documentChunkConcurrency').value = Math.min(Number(documentChunks), Number($('perAnnouncementConcurrency').value), Number($('concurrency').value)); $('documentChunkConcurrencyValue').textContent = $('documentChunkConcurrency').value;
+    const extractionWorkers = saved.extraction_workers || config?.extraction_workers;
+    if (extractionWorkers) { $('extractionWorkers').value = extractionWorkers; $('extractionWorkersValue').textContent = extractionWorkers; }
+    const extractionQueue = saved.extraction_queue_size || config?.extraction_queue_size;
+    if (extractionQueue) { $('extractionQueueSize').value = Math.max(Number($('extractionWorkers').value), Number(extractionQueue)); $('extractionQueueSizeValue').textContent = $('extractionQueueSize').value; }
+    if (saved.stock_only !== undefined) $('stockOnly').checked = Boolean(saved.stock_only);
+    if (saved.historical_audit !== undefined) $('historicalAudit').checked = Boolean(saved.historical_audit);
+    if (saved.smart_attachments !== undefined) $('smartAttachments').checked = Boolean(saved.smart_attachments);
+    if (saved.enable_llm !== undefined) $('enableLlm').checked = Boolean(saved.enable_llm);
+    if (saved.adaptive_llm !== undefined) $('adaptiveLlm').checked = Boolean(saved.adaptive_llm); else if (config?.llm_adaptive_concurrency !== undefined) $('adaptiveLlm').checked = Boolean(config.llm_adaptive_concurrency);
+    if (saved.routine_triage !== undefined) $('routineTriage').checked = Boolean(saved.routine_triage); else if (config?.routine_triage_enabled !== undefined) $('routineTriage').checked = Boolean(config.routine_triage_enabled);
+    if (saved.safe_dedup !== undefined) $('safeDedup').checked = Boolean(saved.safe_dedup); else if (config?.attachment_dedup_enabled !== undefined) $('safeDedup').checked = Boolean(config.attachment_dedup_enabled);
+    if (saved.trace_browser !== undefined) $('traceBrowser').checked = Boolean(saved.trace_browser);
+    if (saved.headless !== undefined) $('headless').checked = Boolean(saved.headless);
+    if (saved.theme) { document.documentElement.dataset.theme = saved.theme; localStorage.setItem('idx-theme', saved.theme); }
+    if (saved.view) switchView(saved.view, false);
+  }
+
+  function scheduleProfileSave() {
+    if (!state.activeProfileId) return;
+    clearTimeout(state.profileSaveTimer);
+    $('autoSaveStatus').textContent = 'Saving…'; $('autoSaveStatus').className = 'autosave saving';
+    state.profileSaveTimer = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/profiles/${state.activeProfileId}/state`, {method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify({state:collectProfileState()})});
+        const body = await res.json(); if (!res.ok) throw new Error(body.detail || 'Autosave failed');
+        $('autoSaveStatus').textContent = `Auto-saved ${localClock(body.state?.autosaved_at)}`; $('autoSaveStatus').className = 'autosave saved';
+      } catch (err) { $('autoSaveStatus').textContent = 'Autosave failed'; $('autoSaveStatus').className = 'autosave'; }
+    }, 450);
+  }
+
+  function renderProfiles(payload) {
+    state.profiles = payload.profiles || []; state.activeProfileId = payload.active_profile_id;
+    $('profileSelect').innerHTML = state.profiles.map(p => `<option value="${escapeHtml(p.id)}" ${p.id===state.activeProfileId?'selected':''}>${escapeHtml(p.name)} · ${p.company_summaries || 0} summaries</option>`).join('');
+    const active = state.profiles.find(p => p.id === state.activeProfileId);
+    if (active) $('profileName').textContent = active.name;
+    const deleteButton=$('deleteProfileButton');
+    if(deleteButton){
+      deleteButton.disabled=!active || active.id==='main' || Boolean(active.legacy) || state.status==='running' || state.status==='queued';
+      deleteButton.title=active?.id==='main'?'Main archive is protected':'Permanently delete this profile and its isolated data';
+    }
+  }
+
+  async function switchProfile(profileId) {
+    if (!profileId || profileId === state.activeProfileId) return;
+    try {
+      $('autoSaveStatus').textContent = 'Switching…';
+      const res = await fetch(`/api/profiles/${encodeURIComponent(profileId)}/activate`, {method:'POST'}); const body = await res.json();
+      if (!res.ok) throw new Error(body.detail || 'Could not switch profile');
+      window.location.reload();
+    } catch (err) { $('profileSelect').value = state.activeProfileId; toast(err.message, true); }
+  }
+
+  async function deleteActiveProfile(){
+    const active=state.profiles.find(p=>p.id===state.activeProfileId);
+    if(!active) return;
+    if(active.id==='main'||active.legacy){toast('Main archive is protected and cannot be deleted.',true);return;}
+    if(state.status==='running'||state.status==='queued'){toast('Stop the active run before deleting this profile.',true);return;}
+    const counts=[`${active.company_summaries||0} company summaries`,`${active.announcement_summaries||0} announcement summaries`,`${active.run_count||0} saved runs`].join(', ');
+    const ok=window.confirm(`Delete profile “${active.name}”?\n\nThis permanently removes its isolated database, attachments, summaries, browser profile, traces, exports, and saved runs.\n\nCurrent contents: ${counts}.\n\nMain archive is not affected.`);
+    if(!ok) return;
+    const button=$('deleteProfileButton'); if(button) button.disabled=true;
+    try{
+      const res=await fetch(`/api/profiles/${encodeURIComponent(active.id)}`,{method:'DELETE'});
+      const body=await res.json(); if(!res.ok) throw new Error(body.detail||'Could not delete profile');
+      toast(`Deleted ${active.name}`); window.location.reload();
+    }catch(err){toast(err.message,true); if(button) button.disabled=false;}
+  }
+
+  function openProfileModal() { $('profileModal').classList.add('open'); $('profileModal').setAttribute('aria-hidden','false'); setTimeout(()=>$('newProfileName').focus(),20); }
+  function closeProfileModal() { $('profileModal').classList.remove('open'); $('profileModal').setAttribute('aria-hidden','true'); }
+  async function createProfile() {
+    const name=$('newProfileName').value.trim(); if(!name){toast('Profile name is required',true);return;}
+    $('profileCreate').disabled=true;
+    try {
+      const res=await fetch('/api/profiles',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,description:$('newProfileDescription').value.trim(),copy_current_config:$('copyProfileConfig').checked,copy_current_prompts:$('copyProfilePrompts').checked})});
+      const body=await res.json(); if(!res.ok) throw new Error(body.detail||'Could not create profile'); window.location.reload();
+    } catch(err){toast(err.message,true);} finally {$('profileCreate').disabled=false;}
+  }
+
+  function fmtDateRange(start,end) {
+    try { return `${new Date(start).toLocaleDateString()} → ${new Date(end).toLocaleDateString()}`; } catch { return `${start} → ${end}`; }
+  }
+  function statusBadge(status) { const cls=status==='completed'?'good':(['partial','interrupted'].includes(status)?'warn':(status==='failed'?'bad':'')); return `<span class="badge ${cls}">${escapeHtml(status||'unknown')}</span>`; }
+
+  function renderLibrary() {
+    const lib=state.library || {windows:[],companies:[],runs:[],counts:{}}; const c=lib.counts||{};
+    $('libraryStats').innerHTML = `<span><b>${(c.company_summaries||0).toLocaleString()}</b> company summaries</span><span><b>${(c.announcement_summaries||0).toLocaleString()}</b> announcement summaries</span><span><b>${(c.document_summaries||0).toLocaleString()}</b> document summaries</span><span><b>${(lib.runs||[]).length.toLocaleString()}</b> saved runs</span>`;
+    $('libraryWindows').innerHTML = lib.windows?.length ? `<div class="ledger-wrap"><table class="ledger"><thead><tr><th>Window</th><th>Companies</th><th>Announcements</th><th>Saved</th></tr></thead><tbody>${lib.windows.map((w,i)=>`<tr data-open-window="${i}"><td><a href="#">${escapeHtml(fmtDateRange(w.start_at,w.end_at))}</a><br><span class="autosave">${escapeHtml(w.start_at)}<br>${escapeHtml(w.end_at)}</span></td><td>${w.company_count}</td><td>${w.announcement_summary_count||0}/${w.announcement_count||0} summarized</td><td>${escapeHtml(fmtAuditTime(w.updated_at))}</td></tr>`).join('')}</tbody></table></div>` : '<div class="empty">No saved company-summary windows in this profile yet.</div>';
+    $('libraryWindows').querySelectorAll('[data-open-window]').forEach(row => row.onclick = e => { e.preventDefault(); openLibraryWindow(lib.windows[Number(row.dataset.openWindow)]); });
+    $('libraryRuns').innerHTML = lib.runs?.length ? `<div class="ledger-wrap"><table class="ledger"><thead><tr><th>Run</th><th>Mode</th><th>Status</th><th>Saved</th></tr></thead><tbody>${lib.runs.map((r,i)=>`<tr data-open-run="${i}"><td><a href="#">${escapeHtml(r.ticker||'All tickers')} · ${escapeHtml(r.run_id)}</a><br><span class="autosave">${escapeHtml(r.start||'')} → ${escapeHtml(r.end||'')}</span></td><td>${escapeHtml(r.mode||'scrape')}</td><td>${statusBadge(r.status)}</td><td>${escapeHtml(fmtAuditTime(r.finished_at||r.created_at))}</td></tr>`).join('')}</tbody></table></div>` : '<div class="empty">No saved runs in this profile yet.</div>';
+    $('libraryRuns').querySelectorAll('[data-open-run]').forEach(row => row.onclick = e => { e.preventDefault(); openSavedRun(lib.runs[Number(row.dataset.openRun)].run_id, true); });
+    renderCompanyIndex(); renderActivityRuns();
+  }
+
+  async function refreshLibrary(silent=false) {
+    try { const res=await fetch('/api/library'); const body=await res.json(); if(!res.ok) throw new Error(body.detail||'Could not load library'); state.library=body; renderLibrary(); if(!silent) toast('Library refreshed'); }
+    catch(err){ if(!silent) toast(err.message,true); }
+  }
+
+  async function openLibraryWindow(w, ticker=null) {
+    try {
+      const res=await fetch('/api/library/window',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({start_at:w.start_at,end_at:w.end_at,ticker})}); const body=await res.json(); if(!res.ok) throw new Error(body.detail||'Could not open library window');
+      state.runId=null; state.status='completed'; state.report={status:'completed',processed_announcements:body.recovery?.announcement_count||0,company_summaries:Object.keys(body.summaries||{}).length,recovery:body.recovery,diagnostics:{}}; state.summaries=body.summaries||{}; state.partialSummaries=body.partial_summaries||{}; state.artifacts=[]; state.activeTicker=ticker && state.summaries[ticker]?ticker:null; state.resultContext={start:w.start_at,end:w.end_at,ticker:ticker||null};
+      $('heroTitle').textContent='Saved intelligence opened.'; $('heroCopy').textContent=`${Object.keys(state.summaries).length} company digests from ${fmtDateRange(w.start_at,w.end_at)}. This came from Library, not the New Run form.`; $('elapsed').textContent='SAVED'; $('elapsedLabel').textContent='library window'; $('resumeButton').hidden=true; renderResult(); renderMetrics(); renderArtifacts(); switchView('desk',false); toast('Saved summary window opened');
+    } catch(err){toast(err.message,true);}
+  }
+
+  function renderCompanyIndex() {
+    const q=($('companySearch')?.value||'').trim().toLowerCase(); const companies=(state.library?.companies||[]).filter(c=>!q || c.ticker.toLowerCase().includes(q) || String(c.overview||'').toLowerCase().includes(q));
+    $('companyCount').textContent=`${companies.length} companies`;
+    $('companyIndex').innerHTML=companies.length?companies.map((c,i)=>`<button class="company-card" type="button" data-company-index="${i}"><strong>${escapeHtml(c.ticker)}</strong><p>${c.window_count} saved window${c.window_count===1?'':'s'} · latest ${escapeHtml(fmtAuditTime(c.latest_updated_at))}</p><div class="overview-mini">${escapeHtml(c.overview||'Saved company digest')}</div></button>`).join(''):'<div class="empty">No matching company summaries.</div>';
+    $('companyIndex').querySelectorAll('[data-company-index]').forEach((btn,i)=>btn.onclick=()=>{const c=companies[i];openLibraryWindow({start_at:c.start_at,end_at:c.end_at},c.ticker);});
+  }
+
+  function renderActivityRuns() {
+    const runs=state.library?.runs||[]; if(!state.activityRunId && runs.length) state.activityRunId=state.runId && runs.some(r=>r.run_id===state.runId)?state.runId:runs[0].run_id;
+    $('activityRunList').innerHTML=runs.length?runs.map(r=>`<button class="activity-run ${r.run_id===state.activityRunId?'active':''}" type="button" data-activity-run="${escapeHtml(r.run_id)}"><strong>${escapeHtml(r.ticker||'ALL')}</strong> · ${escapeHtml(r.run_id)}<br><span class="autosave">${escapeHtml(r.mode)} · ${escapeHtml(r.status)} · ${escapeHtml(fmtAuditTime(r.finished_at||r.created_at))}</span></button>`).join(''):'<div class="empty">No runs saved.</div>';
+    $('activityRunList').querySelectorAll('[data-activity-run]').forEach(btn=>btn.onclick=()=>openActivityRun(btn.dataset.activityRun));
+    if(state.activityRunId) openActivityRun(state.activityRunId,true);
+  }
+
+  async function openActivityRun(runId, silent=false) {
+    state.activityRunId=runId; renderActivityRunsSelectionOnly();
+    const run=(state.library?.runs||[]).find(r=>r.run_id===runId); $('activityRunTitle').textContent=run?`${run.ticker||'All tickers'} · ${runId}`:runId; $('downloadStreamButton').href=`/api/runs/${encodeURIComponent(runId)}/artifacts/stream`;
+    try { const res=await fetch(`/api/library/runs/${encodeURIComponent(runId)}/events?limit=5000`); const body=await res.json(); if(!res.ok) throw new Error(body.detail||'Could not load stream');
+      $('activityMeta').textContent=`${body.total||0} events persisted · showing ${body.returned||0} · ${run?.mode||''} · ${run?.status||''}`;
+      $('activityTimeline').innerHTML=(body.events||[]).length?(body.events||[]).map(e=>`<div class="activity-event"><time>${escapeHtml(fmtAuditTime(e.timestamp||''))}</time><div class="stage">${escapeHtml(e.type==='event'?(e.stage||'event'):(e.type||''))}</div><div>${escapeHtml(e.message||e.description||e.status||e.action||'')} ${e.fields?`<span class="autosave">${escapeHtml(JSON.stringify(e.fields))}</span>`:''}</div></div>`).join(''):'<div class="empty">No stream events saved for this run.</div>';
+      if(!silent) toast('Saved stream opened');
+    } catch(err){$('activityTimeline').innerHTML=`<div class="empty">${escapeHtml(err.message)}</div>`; if(!silent) toast(err.message,true);}
+  }
+  function renderActivityRunsSelectionOnly(){document.querySelectorAll('[data-activity-run]').forEach(btn=>btn.classList.toggle('active',btn.dataset.activityRun===state.activityRunId));}
+
+  async function openSavedRun(runId, goActivity=false) {
+    try { const res=await fetch(`/api/library/runs/${encodeURIComponent(runId)}`); const body=await res.json(); if(!res.ok) throw new Error(body.detail||'Could not open saved run'); state.runId=runId; await hydrateRun(body); state.resultContext=body.request?{start:body.request.start,end:body.request.end,ticker:body.request.ticker||null}:state.resultContext; state.activityRunId=runId; if(goActivity){switchView('activity',false);openActivityRun(runId);} else switchView('desk',false); }
+    catch(err){toast(err.message,true);}
+  }
+
+  async function saveRunSnapshot(runId=null) {
+    const id=runId||state.runId||state.activityRunId; if(!id){toast('Choose a saved run first',true);return;}
+    const button=$('saveSnapshotButton'); if(button)button.disabled=true; if($('snapshotButton'))$('snapshotButton').disabled=true;
+    try { const res=await fetch(`/api/runs/${encodeURIComponent(id)}/snapshot`,{method:'POST'}); if(!res.ok){const body=await res.json();throw new Error(body.detail||'Snapshot failed');} const blob=await res.blob(); const disposition=res.headers.get('content-disposition')||''; const match=disposition.match(/filename="?([^";]+)"?/i); const filename=match?.[1]||`idx-signal-desk-${id}-snapshot.zip`; const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),500);toast('Run snapshot saved'); }
+    catch(err){toast(err.message,true);} finally {if(button)button.disabled=false;if($('snapshotButton'))$('snapshotButton').disabled=false;}
+  }
+
+  async function init() {
+    defaultDates();
+    const savedTheme = localStorage.getItem('idx-theme'); if (savedTheme) document.documentElement.dataset.theme = savedTheme;
+    $('concurrency').oninput = () => { $('concurrencyValue').textContent = $('concurrency').value; if (Number($('perAnnouncementConcurrency').value) > Number($('concurrency').value)) $('perAnnouncementConcurrency').value = $('concurrency').value; $('perAnnouncementConcurrencyValue').textContent = $('perAnnouncementConcurrency').value; if(Number($('documentChunkConcurrency').value)>Number($('perAnnouncementConcurrency').value)) $('documentChunkConcurrency').value=$('perAnnouncementConcurrency').value; $('documentChunkConcurrencyValue').textContent=$('documentChunkConcurrency').value; renderConcurrencyWarning(); scheduleProfileSave(); };
+    $('perAnnouncementConcurrency').oninput = () => { const value=Math.min(Number($('perAnnouncementConcurrency').value),Number($('concurrency').value)); $('perAnnouncementConcurrency').value=value; $('perAnnouncementConcurrencyValue').textContent=value; if(Number($('documentChunkConcurrency').value)>value) $('documentChunkConcurrency').value=value; $('documentChunkConcurrencyValue').textContent=$('documentChunkConcurrency').value; renderConcurrencyWarning(); scheduleProfileSave(); };
+    $('documentChunkConcurrency').oninput = () => { const value=Math.max(1,Math.min(Number($('documentChunkConcurrency').value),Number($('perAnnouncementConcurrency').value),Number($('concurrency').value))); $('documentChunkConcurrency').value=value; $('documentChunkConcurrencyValue').textContent=value; renderConcurrencyWarning(); scheduleProfileSave(); };
+    $('extractionWorkers').oninput = () => { const value=Number($('extractionWorkers').value); $('extractionWorkersValue').textContent=value; if (Number($('extractionQueueSize').value) < value) $('extractionQueueSize').value=value; $('extractionQueueSizeValue').textContent=$('extractionQueueSize').value; scheduleProfileSave(); };
+    $('extractionQueueSize').oninput = () => { const value=Math.max(Number($('extractionWorkers').value),Number($('extractionQueueSize').value)); $('extractionQueueSize').value=value; $('extractionQueueSizeValue').textContent=value; scheduleProfileSave(); };
+    $('presetConservative').onclick=()=>applyPreset('conservative'); $('presetBalanced').onclick=()=>applyPreset('balanced'); $('presetHigh').onclick=()=>applyPreset('high'); renderConcurrencyWarning();
+    $('runForm').addEventListener('submit', startRun); $('resumeButton').onclick = resumeRun; $('recoverButton').onclick = recoverCached; $('finishCachedButton').onclick = finishCachedDigests; $('refineFinancialsButton').onclick = refineFinancials;
+    $('ticker').addEventListener('input', e => { e.target.value = e.target.value.toUpperCase(); scheduleProfileSave(); });
+    ['start','end','keyword','maxAnnouncements','stockOnly','historicalAudit','smartAttachments','enableLlm','adaptiveLlm','routineTriage','safeDedup','traceBrowser','headless'].forEach(id => $(id).addEventListener('change', scheduleProfileSave));
+    $('keyword').addEventListener('input', scheduleProfileSave); $('maxAnnouncements').addEventListener('input', scheduleProfileSave);
+    $('themeButton').onclick = () => { const next = document.documentElement.dataset.theme === 'midnight' ? 'paper' : 'midnight'; document.documentElement.dataset.theme = next; localStorage.setItem('idx-theme', next); scheduleProfileSave(); };
+    document.querySelectorAll('[data-view]').forEach(btn => btn.onclick=()=>switchView(btn.dataset.view));
+    $('promptButton').onclick = openPromptEditor; $('promptClose').onclick = closePromptEditor; $('promptSave').onclick = savePrompt;
+    $('inspectButton').onclick = openTickerInspector; $('auditClose').onclick = closeTickerInspector; $('shareButton').onclick = openSharePanel; $('shareClose').onclick = closeSharePanel; $('shareCopy').onclick = copyShare; $('shareMd').onclick = () => downloadShare('md'); $('shareTxt').onclick = () => downloadShare('txt');
+    $('snapshotButton').onclick=()=>saveRunSnapshot(); $('saveSnapshotButton').onclick=()=>saveRunSnapshot(state.activityRunId); $('applyTuningButton').onclick=applyTuningRecommendation;
+    $('sharePresetFriend').onclick = () => setSharePreset('friend'); $('sharePresetSignals').onclick = () => setSharePreset('signals'); $('sharePresetFull').onclick = () => setSharePreset('full');
+    $('promptReset').onclick = () => resetPrompts([state.activePromptKey]); $('promptResetAll').onclick = () => { if (confirm('Reset all seven prompts to the corporate-action defaults?')) resetPrompts(null); };
+    $('newProfileButton').onclick=openProfileModal; $('deleteProfileButton').onclick=deleteActiveProfile; $('profileClose').onclick=closeProfileModal; $('profileCancel').onclick=closeProfileModal; $('profileCreate').onclick=createProfile; $('profileSelect').onchange=e=>switchProfile(e.target.value);
+    $('refreshLibraryButton').onclick=()=>refreshLibrary(); $('companySearch').addEventListener('input',renderCompanyIndex);
+    $('promptModal').onclick = e => { if (e.target === $('promptModal')) closePromptEditor(); }; $('profileModal').onclick=e=>{if(e.target===$('profileModal'))closeProfileModal();};
+    $('shareModal').onclick = e => { if (e.target === $('shareModal')) closeSharePanel(); }; $('auditModal').onclick = e => { if (e.target === $('auditModal')) closeTickerInspector(); };
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') { closePromptEditor(); closeSharePanel(); closeTickerInspector(); closeProfileModal(); } });
+    $('promptText').addEventListener('input', () => { if (!state.promptData) return; const text=$('promptText').value; $('promptStats').textContent = `${text.length.toLocaleString()} chars · unsaved`; });
+    try {
+      const [healthRes, configRes, runsRes, profilesRes, libraryRes] = await Promise.all([fetch('/api/health'), fetch('/api/config'), fetch('/api/runs'), fetch('/api/profiles'), fetch('/api/library')]);
+      const health = await healthRes.json(), config = await configRes.json(), runs = await runsRes.json(), profiles = await profilesRes.json(), library = await libraryRes.json();
+      renderProfiles(profiles); state.library=library; renderLibrary();
+      $('version').textContent = health.version; $('provider').textContent = config.provider; $('timezone').textContent = config.timezone; $('profileName').textContent=config.profile_name||health.active_profile_name||'Main archive';
+      $('apiKey').textContent = config.api_key_configured ? 'Configured' : 'Missing'; $('dataDir').textContent = config.data_dir; $('promptProfile').textContent = config.prompt_profile || 'Default'; $('companyCacheMode').textContent=config.company_incremental_cache_enabled!==false?'Fingerprint + incremental':'Off'; $('networkRecoveryMode').textContent=config.network_watchdog_enabled!==false?'Watchdog on':'Off'; $('stockMasterMode').textContent=config.stock_master_enabled!==false?'Server scope + allowlist':'Server scope only';
+      $('modelPill').textContent = `${config.provider} · ${config.model.split('/').pop()}`;
+      $('concurrency').value = config.llm_concurrency; $('concurrencyValue').textContent = config.llm_concurrency; $('perAnnouncementConcurrency').value = Math.min(config.llm_per_announcement_concurrency || 2, config.llm_concurrency); $('perAnnouncementConcurrencyValue').textContent = $('perAnnouncementConcurrency').value; $('documentChunkConcurrency').value = Math.min(config.llm_document_chunk_concurrency || 2, Number($('perAnnouncementConcurrency').value), config.llm_concurrency); $('documentChunkConcurrencyValue').textContent = $('documentChunkConcurrency').value; $('extractionWorkers').value = config.extraction_workers || 3; $('extractionWorkersValue').textContent = $('extractionWorkers').value; $('extractionQueueSize').value = Math.max(Number($('extractionWorkers').value), Number(config.extraction_queue_size || 8)); $('extractionQueueSizeValue').textContent = $('extractionQueueSize').value; $('headless').checked = config.browser_headless; $('adaptiveLlm').checked = config.llm_adaptive_concurrency !== false; $('routineTriage').checked = config.routine_triage_enabled !== false; $('safeDedup').checked = config.attachment_dedup_enabled !== false;
+      applyProfileState(profiles.state || config.profile_state || {}, config); renderConcurrencyWarning();
+      $('autoSaveStatus').textContent = profiles.state?.autosaved_at ? `Auto-saved ${localClock(profiles.state.autosaved_at)}` : 'Auto-save ready'; $('autoSaveStatus').className='autosave saved';
+      setConnection('ready','Local server');
+      const latest = (runs.runs || [])[0];
+      if (health.active_run_id) {
+        const active = (runs.runs || []).find(x => x.run_id === health.active_run_id) || await (await fetch(`/api/runs/${health.active_run_id}`)).json();
+        state.runId = active.run_id; state.activeRequest=active.request||null; state.resultContext=active.request?{start:active.request.start,end:active.request.end,ticker:active.request.ticker||null}:null; state.startedAt = new Date(active.started_at || active.created_at).getTime(); state.status = active.status; $('runButton').disabled = true; renderActiveRun(); startTimer(); openEvents(active.run_id, 0);
+      } else if (latest && ['completed','partial','failed','interrupted'].includes(latest.status)) {
+        state.runId = latest.run_id; state.activeRequest=latest.request||null; state.resultContext=latest.request?{start:latest.request.start,end:latest.request.end,ticker:latest.request.ticker||null}:null; state.status = latest.status; state.report = latest.report; state.summaries = latest.summaries || {}; state.partialSummaries = latest.partial_summaries || {}; state.artifacts = latest.artifacts || []; state.startedAt = latest.started_at ? new Date(latest.started_at).getTime() : Date.now(); state.finishedAt = latest.finished_at ? new Date(latest.finished_at).getTime() : Date.now();
+        $('elapsed').textContent = formatElapsed(Math.max(0,(state.finishedAt-state.startedAt)/1000)); $('elapsedLabel').textContent = 'latest runtime'; $('resumeButton').hidden = latest.status === 'completed'; renderResult(); renderMetrics(); renderSlow(); renderArtifacts(); renderObservatory(); state.activityRunId=latest.run_id;
+      }
+      $('snapshotButton').disabled=!state.runId;
+    } catch (err) { setConnection('failed','Offline'); toast('GUI server is not responding', true); }
+  }
+  init();
+})();
+
+</script>
+</body>
+</html>
