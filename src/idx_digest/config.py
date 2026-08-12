@@ -26,6 +26,10 @@ class Settings(BaseSettings):
     idx_user_agent: str = "IDXDisclosureDigest/0.15.5"
     idx_cookie: str = ""
     idx_transport: str = "auto"
+    # curl_cffi impersonation profile for the "impersonate" transport (and the
+    # auto-mode fallback rung). Bump to the newest chromeNNN when Cloudflare
+    # tightens and the current profile starts returning 403.
+    idx_impersonate_profile: str = "chrome131"
     idx_browser_profile_dir: Path = Path("./data/browser-profile")
     idx_browser_headless: bool = False
     idx_browser_navigation_timeout_ms: int = Field(default=60_000, ge=1_000)
