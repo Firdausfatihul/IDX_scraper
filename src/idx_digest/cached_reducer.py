@@ -7,10 +7,10 @@ from typing import Any
 
 from .config import Settings
 from .db import Database
-from .observability import RunObserver
 from .incremental import company_input_fingerprint, promote_single_announcement
+from .observability import RunObserver
+from .share_export import refresh_latest_share_exports
 from .summarizer import OpenRouterSummarizer, SummaryError
-from .share_export import DEFAULT_SHARE_SECTIONS, load_share_bundle, write_share_export
 
 
 @dataclass(frozen=True)
@@ -132,24 +132,6 @@ class CachedCompanyReducer:
 
         return jobs, skipped_existing, skipped_invalid
 
-    def _refresh_share_exports(self, start_at: str, end_at: str, ticker: str | None = None) -> dict[str, str]:
-        bundle = load_share_bundle(
-            self.settings.database_path,
-            start_at=start_at,
-            end_at=end_at,
-            ticker=ticker,
-            sections=DEFAULT_SHARE_SECTIONS,
-        )
-        if not bundle.companies:
-            return {}
-        share_dir = self.settings.data_dir / "share"
-        suffix = f"-{ticker.strip().upper()}" if ticker else "-all-companies"
-        md_path = share_dir / f"latest{suffix}.md"
-        txt_path = share_dir / f"latest{suffix}.txt"
-        write_share_export(bundle, md_path, fmt="md")
-        write_share_export(bundle, txt_path, fmt="txt")
-        return {"markdown": str(md_path), "text": str(txt_path)}
-
     def reduce(
         self,
         *,
@@ -192,7 +174,13 @@ class CachedCompanyReducer:
             if self.observer:
                 self.observer.finish_task(task)
             try:
-                share_exports = self._refresh_share_exports(start_at, end_at, ticker)
+                share_exports = refresh_latest_share_exports(
+                    self.settings.database_path,
+                    self.settings.data_dir,
+                    start_at=start_at,
+                    end_at=end_at,
+                    ticker=ticker,
+                )
             except Exception as exc:
                 share_exports = {}
                 if self.observer:
@@ -285,7 +273,13 @@ class CachedCompanyReducer:
                         if generation_mode == "single_announcement_promotion":
                             promoted.append(finished_job.ticker)
                         try:
-                            self._refresh_share_exports(start_at, end_at, ticker)
+                            refresh_latest_share_exports(
+                                self.settings.database_path,
+                                self.settings.data_dir,
+                                start_at=start_at,
+                                end_at=end_at,
+                                ticker=ticker,
+                            )
                         except Exception as exc:
                             if self.observer:
                                 self.observer.event(
@@ -361,7 +355,13 @@ class CachedCompanyReducer:
         ]
         status = "completed" if not errors and not remaining else "partial"
         try:
-            share_exports = self._refresh_share_exports(start_at, end_at, ticker)
+            share_exports = refresh_latest_share_exports(
+                self.settings.database_path,
+                self.settings.data_dir,
+                start_at=start_at,
+                end_at=end_at,
+                ticker=ticker,
+            )
         except Exception as exc:
             share_exports = {}
             if self.observer:

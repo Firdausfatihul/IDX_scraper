@@ -7,8 +7,8 @@ from zoneinfo import ZoneInfo
 
 import typer
 
-from .config import Settings
 from .cached_reducer import CachedCompanyReducer
+from .config import Settings
 from .db import Database
 from .financial_refiner import CachedFinancialRefiner
 from .observability import RunObserver

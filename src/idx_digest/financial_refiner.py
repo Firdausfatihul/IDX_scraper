@@ -7,9 +7,9 @@ from typing import Any
 from .attachment_selector import classify_attachments, is_financial_report_announcement
 from .config import Settings
 from .db import Database
-from .observability import RunObserver
 from .extractors import extract_document
-from .share_export import DEFAULT_SHARE_SECTIONS, load_share_bundle, write_share_export
+from .observability import RunObserver
+from .share_export import refresh_latest_share_exports
 from .summarizer import OpenRouterSummarizer
 
 
@@ -263,19 +263,6 @@ class CachedFinancialRefiner:
             "announcements": items,
         }
 
-    def _refresh_share(self, start_at: str, end_at: str) -> None:
-        bundle = load_share_bundle(
-            self.settings.database_path,
-            start_at=start_at,
-            end_at=end_at,
-            sections=DEFAULT_SHARE_SECTIONS,
-        )
-        if not bundle.companies:
-            return
-        share_dir = self.settings.data_dir / "share"
-        write_share_export(bundle, share_dir / "latest-all-companies.md", fmt="md")
-        write_share_export(bundle, share_dir / "latest-all-companies.txt", fmt="txt")
-
     def refine(self, *, start_at: str, end_at: str, ticker: str | None = None) -> dict[str, Any]:
         announcements = self._financial_announcements(start_at, end_at, ticker)
         affected_tickers: set[str] = set()
@@ -355,7 +342,12 @@ class CachedFinancialRefiner:
             )
             self.db.export_company(company, self.settings.data_dir / "companies" / company)
             rebuilt_companies.append(company)
-            self._refresh_share(start_at, end_at)
+            refresh_latest_share_exports(
+                self.settings.database_path,
+                self.settings.data_dir,
+                start_at=start_at,
+                end_at=end_at,
+            )
 
         if self.observer:
             self.observer.event(

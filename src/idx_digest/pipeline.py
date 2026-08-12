@@ -1,26 +1,24 @@
 from __future__ import annotations
 
-import json
 import inspect
+import json
 import threading
 from collections import defaultdict
-from concurrent.futures import Future, ThreadPoolExecutor, as_completed
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any
 from zoneinfo import ZoneInfo
 
-from .config import Settings
-from .attachment_selector import classify_attachments, is_financial_report_announcement
 from .attachment_dedup import AttachmentEvidence, deduplicate_attachments
+from .attachment_selector import classify_attachments, is_financial_report_announcement
+from .config import Settings
 from .db import Database
 from .disclosure_classifier import disclosure_class
 from .downloader import AttachmentDownloader
-from .extractors import extract_document
 from .extraction_scheduler import BoundedExtractionScheduler, ExtractionJob
+from .extractors import extract_document
 from .idx_client import IDXClient
-from .llm_scheduler import GlobalLLMScheduler, ScheduledJob
 from .incremental import (
     CoverageRange,
     company_input_fingerprint,
@@ -29,11 +27,12 @@ from .incremental import (
     promote_single_announcement,
     subtract_coverage,
 )
+from .llm_scheduler import GlobalLLMScheduler, ScheduledJob
 from .observability import RunObserver
 from .performance_advisor import build_performance_summary
 from .routine_triage import RoutineEvidence, evaluate_routine_disclosure
+from .share_export import refresh_latest_share_exports
 from .summarizer import OpenRouterSummarizer
-from .share_export import DEFAULT_SHARE_SECTIONS, load_share_bundle, write_share_export
 from .timeutils import parse_idx_datetime
 
 
@@ -193,229 +192,22 @@ class Pipeline:
                 )
             return None
 
-    def _prepare_attachment(
+
+    def _refresh_share_exports(
         self,
-        downloader: AttachmentDownloader,
-        *,
-        announcement_id: str,
-        ticker: str,
-        attachment: dict[str, Any],
-    ) -> PreparedAttachment | None:
-        """Compatibility helper for single-attachment callers/tests.
+        start_at: str,
+        end_at: str,
+        ticker: str | None = None,
+    ) -> dict[str, str]:
+        """Compatibility seam for callers that customize snapshot publishing."""
 
-        The market pipeline uses the split download/extract path so extraction can
-        overlap browser I/O.
-        """
-        local = self._download_or_cached_attachment(
-            downloader, announcement_id=announcement_id, ticker=ticker, attachment=attachment,
-        )
-        if local is None or isinstance(local, PreparedAttachment):
-            return local
-        return self._extract_downloaded_attachment(local, announcement_id=announcement_id, ticker=ticker)
-
-    def _summarize_documents_parallel(
-        self,
-        prepared: list[PreparedAttachment],
-        *,
-        announcement_id: str,
-        ticker: str,
-        title: str,
-    ) -> tuple[list[dict[str, str]], int]:
-        """Summarize uncached documents with bounded thread concurrency.
-
-        SQLite writes are performed by the caller thread as futures complete. This
-        avoids concurrent database writers while still overlapping network-bound
-        OpenRouter inference calls.
-        """
-        if not self.summarizer:
-            return [], 0
-
-        pending: list[PreparedAttachment] = []
-        for document in prepared:
-            cached_summary = self.db.get_document_summary(
-                document.url,
-                model=self.summarizer.model,
-                prompt_version=self._document_prompt_version(title),
-            )
-            if self.summarizer.is_valid_document_summary(cached_summary):
-                if self.observer:
-                    self.observer.event(
-                        "cache",
-                        "document summary cache hit",
-                        ticker=ticker,
-                        filename=document.filename,
-                    )
-            else:
-                pending.append(document)
-
-        if not pending:
-            return [], 0
-
-        workers = min(self.settings.llm_concurrency, len(pending))
-        errors: list[dict[str, str]] = []
-        completed_summaries = 0
-        summary_task = self.observer.start_task(
-            f"Document summaries {ticker} • {title[:52]} • workers={workers}",
-            total=len(pending),
-            kind="items",
-        ) if self.observer else None
-
-        if self.observer:
-            self.observer.event(
-                "parallel",
-                "document summary batch started",
-                always=True,
-                ticker=ticker,
-                announcement_id=announcement_id,
-                documents=len(pending),
-                workers=workers,
-            )
-            if self.observer.stream_llm and workers > 1:
-                self.observer.event(
-                    "parallel",
-                    "raw document streams disabled to prevent interleaved JSON; announcement and company streams remain enabled",
-                    level="WARNING",
-                    always=True,
-                    workers=workers,
-                )
-
-        def summarize_one(document: PreparedAttachment) -> dict[str, Any]:
-            text = document.text_path.read_text(encoding="utf-8", errors="replace")
-            label = f"{ticker} document summary {document.filename}"
-            # Multiple raw SSE streams cannot share one terminal. Stream only when
-            # this batch is effectively sequential; otherwise retain timestamped
-            # request/completion events for each worker.
-            stream = None if workers == 1 else False
-            financial_chunk_chars = (
-                min(self.settings.llm_chunk_chars, 22_000)
-                if is_financial_report_announcement(title)
-                else None
-            )
-            if self.observer:
-                with self.observer.timed(
-                    "llm-document",
-                    label,
-                    announcement_id=announcement_id,
-                    filename=document.filename,
-                    characters=len(text),
-                    workers=workers,
-                ):
-                    kwargs = {
-                        "ticker": ticker,
-                        "filename": document.filename,
-                        "text": text,
-                        "stream": stream,
-                        "source_url": document.url,
-                        "announcement_id": announcement_id,
-                        "document_profile": self._document_profile(title),
-                    }
-                    if financial_chunk_chars is not None:
-                        kwargs["chunk_chars"] = financial_chunk_chars
-                    if not self._document_profile_supported():
-                        kwargs.pop("document_profile", None)
-                    return self.summarizer.summarize_document(**kwargs)
-            kwargs = {
-                "ticker": ticker,
-                "filename": document.filename,
-                "text": text,
-                "stream": stream,
-                "source_url": document.url,
-                "announcement_id": announcement_id,
-                "document_profile": self._document_profile(title),
-            }
-            if financial_chunk_chars is not None:
-                kwargs["chunk_chars"] = financial_chunk_chars
-            if not self._document_profile_supported():
-                kwargs.pop("document_profile", None)
-            return self.summarizer.summarize_document(**kwargs)
-
-        futures: dict[Future[dict[str, Any]], PreparedAttachment] = {}
-        try:
-            with ThreadPoolExecutor(
-                max_workers=workers,
-                thread_name_prefix="idx-document-summary",
-            ) as executor:
-                for document in pending:
-                    futures[executor.submit(summarize_one, document)] = document
-
-                for future in as_completed(futures):
-                    document = futures[future]
-                    try:
-                        summary = future.result()
-                        self.db.save_document_summary(
-                            document.url,
-                            ticker,
-                            summary,
-                            self.summarizer.model,
-                            self._document_prompt_version(title),
-                        )
-                        completed_summaries += 1
-                        if self.observer:
-                            self.observer.event(
-                                "llm-document",
-                                "document summary stored",
-                                ticker=ticker,
-                                filename=document.filename,
-                                chunk_count=summary.get("chunk_count"),
-                                summary_preview=str(summary.get("summary") or "")[:180],
-                            )
-                    except Exception as exc:
-                        errors.append(
-                            {
-                                "id": announcement_id,
-                                "filename": document.filename,
-                                "stage": "document-summary",
-                                "error": str(exc),
-                            }
-                        )
-                        if self.observer:
-                            self.observer.event(
-                                "llm-document",
-                                "document summary failed",
-                                level="ERROR",
-                                always=True,
-                                ticker=ticker,
-                                announcement_id=announcement_id,
-                                filename=document.filename,
-                                error=str(exc),
-                            )
-                    finally:
-                        if self.observer:
-                            self.observer.update_task(summary_task, advance=1)
-        finally:
-            if self.observer:
-                self.observer.finish_task(summary_task)
-                self.observer.event(
-                    "parallel",
-                    "document summary batch finished",
-                    always=True,
-                    ticker=ticker,
-                    announcement_id=announcement_id,
-                    requested=len(pending),
-                    completed=completed_summaries,
-                    failed=len(errors),
-                    workers=workers,
-                )
-
-        return errors, completed_summaries
-
-    def _refresh_share_exports(self, start_at: str, end_at: str, ticker: str | None = None) -> dict[str, str]:
-        bundle = load_share_bundle(
+        return refresh_latest_share_exports(
             self.settings.database_path,
+            self.settings.data_dir,
             start_at=start_at,
             end_at=end_at,
-            ticker=(ticker or "").strip().upper() or None,
-            sections=DEFAULT_SHARE_SECTIONS,
+            ticker=ticker,
         )
-        if not bundle.companies:
-            return {}
-        share_dir = self.settings.data_dir / "share"
-        suffix = f"-{ticker.strip().upper()}" if ticker else "-all-companies"
-        md_path = share_dir / f"latest{suffix}.md"
-        txt_path = share_dir / f"latest{suffix}.txt"
-        write_share_export(bundle, md_path, fmt="md")
-        write_share_export(bundle, txt_path, fmt="txt")
-        return {"markdown": str(md_path), "text": str(txt_path)}
 
     def close(self) -> None:
         if self.summarizer:
@@ -537,13 +329,6 @@ class Pipeline:
             except ValueError:
                 continue
         return normalize_coverage_ranges(candidates)
-
-    def _latest_successful_poll_end_from_reports(self, ticker: str | None) -> datetime | None:
-        """Backward-compatible wrapper for callers that still need a high end."""
-
-        scope_key = f"stocks:{(ticker or 'ALL').strip().upper()}"
-        ranges = self._successful_coverage_from_reports(scope_key=scope_key, ticker=ticker)
-        return max((item.end for item in ranges), default=None)
 
     def _export_company_checkpoint(self, ticker: str) -> None:
         lock = self._company_export_locks[ticker]
@@ -898,6 +683,149 @@ class Pipeline:
             except Exception as exc:
                 self._append_error(errors, errors_lock, {"id": plan.announcement_id, "stage": "checkpoint-export", "error": str(exc)})
         return True
+
+    def _reduce_company_windows(
+        self,
+        *,
+        tickers: set[str],
+        start_at: datetime,
+        end_at: datetime,
+        ticker: str | None,
+        scrape_complete: bool,
+        scrape_error: str | None,
+        scheduler: GlobalLLMScheduler | None,
+        scheduler_metrics: dict[str, Any],
+        errors: list[dict[str, str]],
+        errors_lock: threading.Lock,
+    ) -> tuple[int, dict[str, int], dict[str, Any]]:
+        """Resolve company caches/promotions and schedule only required reducers."""
+
+        company_summaries = 0
+        company_count_lock = threading.Lock()
+        company_stats = {
+            "eligible": 0, "cache_hits": 0, "promoted_single": 0,
+            "rebuilding": 0, "skipped_no_evidence": 0,
+        }
+        company_task = self.observer.start_task("Building company-window summaries", total=len(tickers), kind="items") if self.observer and self.summarizer else None
+        if self.summarizer and scheduler is not None:
+            company_prompt_version = getattr(self.summarizer, "company_prompt_version", "legacy-company")
+            announcement_prompt_version = getattr(self.summarizer, "announcement_prompt_version", "legacy-announcement")
+            for company in sorted(tickers):
+                records = self.db.company_announcement_summaries(
+                    company, start_at.isoformat(), end_at.isoformat(),
+                    model=self.summarizer.model, prompt_version=announcement_prompt_version,
+                )
+                records = [r for r in records if self.summarizer.is_valid_announcement_summary(r.get("summary"))]
+                if not records:
+                    company_stats["skipped_no_evidence"] += 1
+                    if self.observer:
+                        self.observer.event("company-cache", "company skipped before scheduler; no valid announcement summaries", ticker=company)
+                        self.observer.update_task(company_task, advance=1)
+                    continue
+                company_stats["eligible"] += 1
+                self._assert_company_isolation(company, records)
+                fingerprint = company_input_fingerprint(
+                    ticker=company, start_at=start_at.isoformat(), end_at=end_at.isoformat(),
+                    announcements=records, model=self.summarizer.model, prompt_version=company_prompt_version,
+                )
+                if getattr(self.settings, "company_incremental_cache_enabled", True) and self.db.company_summary_is_current(
+                    company, start_at.isoformat(), end_at.isoformat(),
+                    model=self.summarizer.model, prompt_version=company_prompt_version, input_fingerprint=fingerprint,
+                ):
+                    company_stats["cache_hits"] += 1
+                    row = self.db.company_summary_record(company, start_at.isoformat(), end_at.isoformat())
+                    cached_summary = json.loads(row["summary_json"]) if row else None
+                    if self.observer:
+                        self.observer.event(
+                            "company-cache", "company summary cache hit", ticker=company,
+                            input_fingerprint=fingerprint, generation_mode=(row["generation_mode"] if row else None),
+                            summary=cached_summary,
+                        )
+                        self.observer.update_task(company_task, advance=1)
+                    continue
+                if len(records) == 1 and getattr(self.settings, "company_single_announcement_promotion", True):
+                    summary = promote_single_announcement(
+                        ticker=company, start_at=start_at.isoformat(), end_at=end_at.isoformat(), record=records[0],
+                    )
+                    summary["_checkpoint"] = {
+                        "partial": not scrape_complete, "announcement_summaries_used": 1,
+                        "scrape_error": scrape_error, "generation_mode": "single_announcement_promotion",
+                    }
+                    self.db.save_company_summary(
+                        company, start_at.isoformat(), end_at.isoformat(), summary, self.summarizer.model, company_prompt_version,
+                        input_fingerprint=fingerprint, generation_mode="single_announcement_promotion", source_announcement_count=1,
+                    )
+                    company_stats["promoted_single"] += 1
+                    company_summaries += 1
+                    try:
+                        self._export_company_checkpoint(company)
+                    except Exception as exc:
+                        self._append_error(errors,errors_lock,{"id":company,"stage":"checkpoint-export","error":str(exc)})
+                    if self.observer:
+                        self.observer.event(
+                            "llm-company", "single announcement promoted without extra LLM call",
+                            ticker=company, announcements=1, input_fingerprint=fingerprint, summary=summary,
+                        )
+                        self.observer.update_task(company_task, advance=1)
+                    continue
+
+                company_stats["rebuilding"] += 1
+                def company_job(company: str = company, records: list[dict[str, Any]] = records, fingerprint: str = fingerprint) -> dict[str, Any] | None:
+                    label=f"{company} company window summary"
+                    if self.observer:
+                        with self.observer.timed("llm-company", label, announcements=len(records), partial=not scrape_complete, scheduler="global"):
+                            summary=self.summarizer.summarize_company_window(ticker=company,start_at=start_at.isoformat(),end_at=end_at.isoformat(),announcements=records,stream=False if self.settings.llm_concurrency > 1 else None)
+                    else:
+                        summary=self.summarizer.summarize_company_window(ticker=company,start_at=start_at.isoformat(),end_at=end_at.isoformat(),announcements=records,stream=False if self.settings.llm_concurrency > 1 else None)
+                    summary = dict(summary)
+                    summary["_checkpoint"] = {
+                        "partial": not scrape_complete,
+                        "announcement_summaries_used": len(records),
+                        "scrape_error": scrape_error,
+                        "generation_mode": "llm",
+                        "input_fingerprint": fingerprint,
+                    }
+                    self.db.save_company_summary(
+                        company,start_at.isoformat(),end_at.isoformat(),summary,self.summarizer.model,company_prompt_version,
+                        input_fingerprint=fingerprint,generation_mode="llm",source_announcement_count=len(records),
+                    )
+                    self._export_company_checkpoint(company)
+                    try:
+                        with self._share_export_lock:
+                            self._refresh_share_exports(
+                                start_at.isoformat(), end_at.isoformat(), ticker
+                            )
+                    except Exception as exc:
+                        if self.observer:
+                            self.observer.event("export","share snapshot refresh failed",level="WARNING",ticker=company,error=str(exc))
+                    if self.observer:
+                        self.observer.event("llm-company","company-window summary stored",ticker=company,announcements=len(records),partial=not scrape_complete,input_fingerprint=fingerprint,overview_preview=str(summary.get("overview") or "")[:220],summary=summary)
+                    return summary
+                def company_done(value: Any | None,error: BaseException | None,company: str=company) -> None:
+                    nonlocal company_summaries
+                    if error is not None:
+                        self._append_error(errors,errors_lock,{"id":company,"stage":"company-summary","error":str(error)})
+                        if self.observer:
+                            self.observer.event("llm-company","company digest failed; announcement summaries remain recoverable",level="ERROR",always=True,ticker=company,error=str(error))
+                    elif value is not None:
+                        with company_count_lock:
+                            company_summaries += 1
+                    if self.observer:
+                        self.observer.update_task(company_task,advance=1)
+                scheduler.submit(ScheduledJob(job_id=f"company:{company}:{start_at.isoformat()}:{end_at.isoformat()}",group_key=f"company:{company}",stage="company",ticker=company,func=company_job,on_complete=company_done))
+            if self.observer:
+                self.observer.event(
+                    "company-cache", "company reducer plan ready", always=True,
+                    total_companies=len(tickers), **company_stats,
+                )
+            scheduler_metrics=scheduler.wait()
+            if self.observer:
+                self.observer.finish_task(company_task)
+                self.observer.event("company-cache", "company reducer scope resolved", always=True, **company_stats)
+            scheduler.close()
+        elif scheduler is not None:
+            scheduler.close()
+        return company_summaries, company_stats, scheduler_metrics
 
     def run(self, *, start_at: datetime, end_at: datetime, ticker: str | None = None, keyword: str = "", max_announcements: int | None = None, attachment_policy: str = "smart", instrument_scope: str = "stocks", metadata_mode: str = "incremental") -> dict[str, Any]:
         if end_at < start_at:
@@ -1374,13 +1302,18 @@ class Pipeline:
                         attachments = item.get("attachments") or []
                         decisions = classify_attachments(title, attachments, policy=attachment_policy)
                         selected_count = sum(1 for d in decisions if d.selected)
-                        selection_changed = False
-                        for decision in decisions:
-                            url = str(decision.attachment.get("FullSavePath") or "")
-                            previous = self.db.attachment_state(url) if url else None
-                            if previous is not None and bool(previous["selected_for_analysis"]) != decision.selected:
-                                selection_changed = True
-                            self.db.upsert_attachment(announcement_id, decision.attachment, selected_for_analysis=decision.selected, selection_reason=decision.reason, selection_category=decision.category)
+                        selection_changed = self.db.upsert_attachments(
+                            announcement_id,
+                            [
+                                (
+                                    decision.attachment,
+                                    decision.selected,
+                                    decision.reason,
+                                    decision.category,
+                                )
+                                for decision in decisions
+                            ],
+                        )
                         if selection_changed:
                             self.db.delete_announcement_summary(announcement_id)
                         if self.observer:
@@ -1463,7 +1396,8 @@ class Pipeline:
             if self.observer:
                 self.observer.event("run", "scrape interrupted; queued LLM checkpoints will finish before recovery export", level="ERROR", always=True, error=scrape_error, processed_announcements=processed)
         finally:
-            downloader.close(); idx.close()
+            downloader.close()
+            idx.close()
             if idx.browser and idx.browser.trace_path:
                 browser_trace_path = str(idx.browser.trace_path)
         if self.observer:
@@ -1478,129 +1412,27 @@ class Pipeline:
             scheduler_metrics = scheduler.wait()
             if self.observer:
                 self.observer.event("scheduler", "global document/announcement queue drained", always=True, **scheduler_metrics)
-        company_summaries = 0
-        company_count_lock = threading.Lock()
-        company_stats = {
-            "eligible": 0, "cache_hits": 0, "promoted_single": 0,
-            "rebuilding": 0, "skipped_no_evidence": 0,
-        }
-        company_task = self.observer.start_task("Building company-window summaries", total=len(tickers), kind="items") if self.observer and self.summarizer else None
-        if self.summarizer and scheduler is not None:
-            company_prompt_version = getattr(self.summarizer, "company_prompt_version", "legacy-company")
-            announcement_prompt_version = getattr(self.summarizer, "announcement_prompt_version", "legacy-announcement")
-            for company in sorted(tickers):
-                records = self.db.company_announcement_summaries(
-                    company, start_at.isoformat(), end_at.isoformat(),
-                    model=self.summarizer.model, prompt_version=announcement_prompt_version,
-                )
-                records = [r for r in records if self.summarizer.is_valid_announcement_summary(r.get("summary"))]
-                if not records:
-                    company_stats["skipped_no_evidence"] += 1
-                    if self.observer:
-                        self.observer.event("company-cache", "company skipped before scheduler; no valid announcement summaries", ticker=company)
-                        self.observer.update_task(company_task, advance=1)
-                    continue
-                company_stats["eligible"] += 1
-                self._assert_company_isolation(company, records)
-                fingerprint = company_input_fingerprint(
-                    ticker=company, start_at=start_at.isoformat(), end_at=end_at.isoformat(),
-                    announcements=records, model=self.summarizer.model, prompt_version=company_prompt_version,
-                )
-                if getattr(self.settings, "company_incremental_cache_enabled", True) and self.db.company_summary_is_current(
-                    company, start_at.isoformat(), end_at.isoformat(),
-                    model=self.summarizer.model, prompt_version=company_prompt_version, input_fingerprint=fingerprint,
-                ):
-                    company_stats["cache_hits"] += 1
-                    row = self.db.company_summary_record(company, start_at.isoformat(), end_at.isoformat())
-                    cached_summary = json.loads(row["summary_json"]) if row else None
-                    if self.observer:
-                        self.observer.event(
-                            "company-cache", "company summary cache hit", ticker=company,
-                            input_fingerprint=fingerprint, generation_mode=(row["generation_mode"] if row else None),
-                            summary=cached_summary,
-                        )
-                        self.observer.update_task(company_task, advance=1)
-                    continue
-                if len(records) == 1 and getattr(self.settings, "company_single_announcement_promotion", True):
-                    summary = promote_single_announcement(
-                        ticker=company, start_at=start_at.isoformat(), end_at=end_at.isoformat(), record=records[0],
-                    )
-                    summary["_checkpoint"] = {
-                        "partial": not scrape_complete, "announcement_summaries_used": 1,
-                        "scrape_error": scrape_error, "generation_mode": "single_announcement_promotion",
-                    }
-                    self.db.save_company_summary(
-                        company, start_at.isoformat(), end_at.isoformat(), summary, self.summarizer.model, company_prompt_version,
-                        input_fingerprint=fingerprint, generation_mode="single_announcement_promotion", source_announcement_count=1,
-                    )
-                    company_stats["promoted_single"] += 1
-                    company_summaries += 1
-                    try:
-                        self._export_company_checkpoint(company)
-                    except Exception as exc:
-                        self._append_error(errors,errors_lock,{"id":company,"stage":"checkpoint-export","error":str(exc)})
-                    if self.observer:
-                        self.observer.event(
-                            "llm-company", "single announcement promoted without extra LLM call",
-                            ticker=company, announcements=1, input_fingerprint=fingerprint, summary=summary,
-                        )
-                        self.observer.update_task(company_task, advance=1)
-                    continue
-
-                company_stats["rebuilding"] += 1
-                def company_job(company: str = company, records: list[dict[str, Any]] = records, fingerprint: str = fingerprint) -> dict[str, Any] | None:
-                    label=f"{company} company window summary"
-                    if self.observer:
-                        with self.observer.timed("llm-company", label, announcements=len(records), partial=not scrape_complete, scheduler="global"):
-                            summary=self.summarizer.summarize_company_window(ticker=company,start_at=start_at.isoformat(),end_at=end_at.isoformat(),announcements=records,stream=False if self.settings.llm_concurrency > 1 else None)
-                    else:
-                        summary=self.summarizer.summarize_company_window(ticker=company,start_at=start_at.isoformat(),end_at=end_at.isoformat(),announcements=records,stream=False if self.settings.llm_concurrency > 1 else None)
-                    summary=dict(summary); summary["_checkpoint"]={"partial":not scrape_complete,"announcement_summaries_used":len(records),"scrape_error":scrape_error,"generation_mode":"llm","input_fingerprint":fingerprint}
-                    self.db.save_company_summary(
-                        company,start_at.isoformat(),end_at.isoformat(),summary,self.summarizer.model,company_prompt_version,
-                        input_fingerprint=fingerprint,generation_mode="llm",source_announcement_count=len(records),
-                    )
-                    self._export_company_checkpoint(company)
-                    try:
-                        with self._share_export_lock:
-                            self._refresh_share_exports(start_at.isoformat(),end_at.isoformat(),ticker)
-                    except Exception as exc:
-                        if self.observer:
-                            self.observer.event("export","share snapshot refresh failed",level="WARNING",ticker=company,error=str(exc))
-                    if self.observer:
-                        self.observer.event("llm-company","company-window summary stored",ticker=company,announcements=len(records),partial=not scrape_complete,input_fingerprint=fingerprint,overview_preview=str(summary.get("overview") or "")[:220],summary=summary)
-                    return summary
-                def company_done(value: Any | None,error: BaseException | None,company: str=company) -> None:
-                    nonlocal company_summaries
-                    if error is not None:
-                        self._append_error(errors,errors_lock,{"id":company,"stage":"company-summary","error":str(error)})
-                        if self.observer:
-                            self.observer.event("llm-company","company digest failed; announcement summaries remain recoverable",level="ERROR",always=True,ticker=company,error=str(error))
-                    elif value is not None:
-                        with company_count_lock:
-                            company_summaries += 1
-                    if self.observer:
-                        self.observer.update_task(company_task,advance=1)
-                scheduler.submit(ScheduledJob(job_id=f"company:{company}:{start_at.isoformat()}:{end_at.isoformat()}",group_key=f"company:{company}",stage="company",ticker=company,func=company_job,on_complete=company_done))
-            if self.observer:
-                self.observer.event(
-                    "company-cache", "company reducer plan ready", always=True,
-                    total_companies=len(tickers), **company_stats,
-                )
-            scheduler_metrics=scheduler.wait()
-            if self.observer:
-                self.observer.finish_task(company_task)
-                self.observer.event("company-cache", "company reducer scope resolved", always=True, **company_stats)
-            scheduler.close()
-        elif scheduler is not None:
-            scheduler.close()
+        company_summaries, company_stats, scheduler_metrics = self._reduce_company_windows(
+            tickers=tickers,
+            start_at=start_at,
+            end_at=end_at,
+            ticker=ticker,
+            scrape_complete=scrape_complete,
+            scrape_error=scrape_error,
+            scheduler=scheduler,
+            scheduler_metrics=scheduler_metrics,
+            errors=errors,
+            errors_lock=errors_lock,
+        )
         for company in tickers:
             try:
                 self._export_company_checkpoint(company)
             except Exception as exc:
                 self._append_error(errors,errors_lock,{"id":company,"stage":"checkpoint-export","error":str(exc)})
         try:
-            share_exports=self._refresh_share_exports(start_at.isoformat(),end_at.isoformat(),ticker)
+            share_exports = self._refresh_share_exports(
+                start_at.isoformat(), end_at.isoformat(), ticker
+            )
         except Exception as exc:
             share_exports={}
             if self.observer:
@@ -1694,7 +1526,11 @@ class Pipeline:
             "performance": performance_summary,
             "diagnostics":{"log_file":str(self.observer.log_file) if self.observer and self.observer.log_file else None,"browser_trace":browser_trace_path,"llm_concurrency":self.settings.llm_concurrency,"llm_per_announcement_concurrency":per_announcement_limit,"llm_document_chunk_concurrency":self.settings.llm_document_chunk_concurrency,"llm_per_ticker_concurrency":per_ticker_llm_limit,"scheduler":"global-phase-4" if self.summarizer else None,"scheduler_metrics":scheduler_metrics,"provider_metrics":provider_metrics,"phase3_metrics":dict(self._phase3_metrics),"phase4_performance":performance_summary,"routine_triage_enabled":getattr(self.settings, "routine_triage_enabled", True),"attachment_dedup_enabled":getattr(self.settings, "attachment_dedup_enabled", True),"adaptive_provider_enabled":getattr(self.settings, "llm_adaptive_concurrency", True),"extraction_workers":extraction_workers,"extraction_queue_size":extraction_backlog,"extraction_metrics":extraction_metrics,"stage_timings":stage_timings,"company_cache":company_stats,"metadata_mode":metadata_mode,"metadata_poll_snapshot":metadata_poll_snapshot.isoformat(),"metadata_effective_start":metadata_effective_start.isoformat(),"metadata_cached_duplicates":metadata_cached_duplicates,"metadata_reported_total":metadata_reported_total,"metadata_trusted_history_skipped":metadata_skipped_trusted_history,"metadata_noop":metadata_noop,"metadata_watermark_before":metadata_watermark_before,"metadata_watermark_after":watermark_after,"metadata_coverage_before":[item.as_dict() for item in metadata_coverage_before],"metadata_coverage_after":[item.as_dict() for item in metadata_coverage_after],"metadata_missing_ranges":[item.as_dict() for item in metadata_missing_ranges],"metadata_query_ranges":[item.as_dict() for item in metadata_query_ranges],"metadata_deferred_ranges":[item.as_dict() for item in metadata_deferred_ranges],"metadata_coverage_added":[item.as_dict() for item in metadata_coverage_added],"metadata_diagnostics":metadata_diagnostics,"prompt_profile":self.summarizer.prompts.profile_name if self.summarizer else None,"prompt_hashes":self.summarizer.prompts.hashes if self.summarizer else None,"prompt_file":str(self.settings.prompt_config_path) if self.summarizer else None,**timing_report},
         }
-        report_path=self.settings.data_dir/"last_run.json"; report_path.write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding="utf-8")
+        report_path = self.settings.data_dir / "last_run.json"
+        report_path.write_text(
+            json.dumps(report, ensure_ascii=False, indent=2),
+            encoding="utf-8",
+        )
         if self.observer:
             self.observer.event("run","scrape finished" if scrape_complete else "partial run checkpointed",status=run_status,scrape_complete=scrape_complete,processed_announcements=processed,company_summaries=company_summaries,recoverable_announcement_summaries=recovery["announcement_summary_count"],errors=len(errors),llm_concurrency=self.settings.llm_concurrency,llm_per_announcement_concurrency=per_announcement_limit,llm_document_chunk_concurrency=self.settings.llm_document_chunk_concurrency,llm_per_ticker_concurrency=per_ticker_llm_limit,scheduler="global-phase-4" if self.summarizer else None,phase3_metrics=dict(self._phase3_metrics),provider_metrics=provider_metrics,performance=performance_summary,elapsed_seconds=timing_report["total_elapsed_seconds"],report_path=str(report_path),log_file=str(self.observer.log_file) if self.observer.log_file else None,browser_trace=browser_trace_path)
         return report

@@ -4,8 +4,8 @@ import socket
 import threading
 import time
 from dataclasses import dataclass
-from urllib.parse import urlparse
 from typing import Any
+from urllib.parse import urlparse
 
 
 @dataclass(frozen=True)

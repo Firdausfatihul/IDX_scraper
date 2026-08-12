@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from datetime import datetime
 from pathlib import Path
-from types import SimpleNamespace
 from zoneinfo import ZoneInfo
 
 from idx_digest.config import Settings

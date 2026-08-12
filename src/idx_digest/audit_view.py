@@ -8,7 +8,6 @@ from typing import Any
 from .db import Database
 from .prompts import PromptStore
 
-
 CLAIM_FIELDS = (
     ("material_changes", "material_change"),
     ("key_financial_figures", "financial_figure"),

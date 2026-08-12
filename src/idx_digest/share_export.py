@@ -8,7 +8,6 @@ from typing import Any, Iterable
 
 from .db import Database
 
-
 SECTION_ORDER = (
     "overview",
     "timeline",
@@ -294,6 +293,38 @@ def write_share_export(
     temp.write_text(text, encoding="utf-8")
     temp.replace(destination)
     return destination
+
+
+def refresh_latest_share_exports(
+    database_path: Path,
+    data_dir: Path,
+    *,
+    start_at: str,
+    end_at: str,
+    ticker: str | None = None,
+) -> dict[str, str]:
+    """Atomically refresh the standard Markdown and text share snapshots."""
+
+    normalized_ticker = (ticker or "").strip().upper() or None
+    bundle = load_share_bundle(
+        database_path,
+        start_at=start_at,
+        end_at=end_at,
+        ticker=normalized_ticker,
+        sections=DEFAULT_SHARE_SECTIONS,
+    )
+    if not bundle.companies:
+        return {}
+
+    suffix = f"-{normalized_ticker}" if normalized_ticker else "-all-companies"
+    share_dir = data_dir / "share"
+    paths = {
+        "markdown": share_dir / f"latest{suffix}.md",
+        "text": share_dir / f"latest{suffix}.txt",
+    }
+    write_share_export(bundle, paths["markdown"], fmt="md")
+    write_share_export(bundle, paths["text"], fmt="txt")
+    return {key: str(path) for key, path in paths.items()}
 
 
 def default_share_filename(fmt: str, *, ticker: str | None = None) -> str:

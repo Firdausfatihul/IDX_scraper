@@ -7,148 +7,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable, Iterator
 
-
-SCHEMA = """
-PRAGMA journal_mode=WAL;
-PRAGMA foreign_keys=ON;
-
-CREATE TABLE IF NOT EXISTS announcements (
-    id2 TEXT PRIMARY KEY,
-    ticker TEXT NOT NULL,
-    announced_at TEXT NOT NULL,
-    title TEXT NOT NULL,
-    announcement_no TEXT,
-    announcement_type TEXT,
-    subject TEXT,
-    raw_json TEXT NOT NULL,
-    fetched_at TEXT NOT NULL
-);
-CREATE INDEX IF NOT EXISTS idx_announcements_ticker_time
-    ON announcements(ticker, announced_at);
-
-CREATE TABLE IF NOT EXISTS scrape_watermarks (
-    scope_key TEXT PRIMARY KEY,
-    last_successful_poll_end TEXT NOT NULL,
-    last_seen_announcement_at TEXT,
-    baseline_source TEXT NOT NULL DEFAULT 'runtime',
-    updated_at TEXT NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS scrape_coverage_ranges (
-    scope_key TEXT NOT NULL,
-    covered_start TEXT NOT NULL,
-    covered_end TEXT NOT NULL,
-    baseline_source TEXT NOT NULL DEFAULT 'runtime',
-    updated_at TEXT NOT NULL,
-    PRIMARY KEY (scope_key, covered_start, covered_end)
-);
-CREATE INDEX IF NOT EXISTS idx_scrape_coverage_scope_start
-    ON scrape_coverage_ranges(scope_key, covered_start);
-
-CREATE TABLE IF NOT EXISTS attachments (
-    url TEXT PRIMARY KEY,
-    announcement_id TEXT NOT NULL REFERENCES announcements(id2) ON DELETE CASCADE,
-    original_filename TEXT NOT NULL,
-    is_attachment INTEGER NOT NULL DEFAULT 0,
-    local_path TEXT,
-    sha256 TEXT,
-    content_type TEXT,
-    extracted_text_path TEXT,
-    extraction_method TEXT,
-    extraction_error TEXT,
-    selected_for_analysis INTEGER NOT NULL DEFAULT 1,
-    selection_reason TEXT,
-    selection_category TEXT,
-    duplicate_of_url TEXT,
-    downloaded_at TEXT,
-    extracted_at TEXT,
-    updated_at TEXT NOT NULL
-);
-CREATE INDEX IF NOT EXISTS idx_attachments_announcement
-    ON attachments(announcement_id);
-
-CREATE TABLE IF NOT EXISTS document_summaries (
-    url TEXT PRIMARY KEY REFERENCES attachments(url) ON DELETE CASCADE,
-    ticker TEXT NOT NULL,
-    summary_json TEXT NOT NULL,
-    model TEXT NOT NULL,
-    prompt_version TEXT NOT NULL,
-    updated_at TEXT NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS document_chunk_summaries (
-    url TEXT NOT NULL REFERENCES attachments(url) ON DELETE CASCADE,
-    chunk_index INTEGER NOT NULL,
-    chunk_count INTEGER NOT NULL,
-    chunk_sha256 TEXT NOT NULL,
-    summary_json TEXT NOT NULL,
-    model TEXT NOT NULL,
-    prompt_version TEXT NOT NULL,
-    updated_at TEXT NOT NULL,
-    PRIMARY KEY (url, chunk_index, model, prompt_version)
-);
-CREATE INDEX IF NOT EXISTS idx_document_chunk_summaries_url
-    ON document_chunk_summaries(url);
-
-CREATE TABLE IF NOT EXISTS announcement_summaries (
-    announcement_id TEXT PRIMARY KEY REFERENCES announcements(id2) ON DELETE CASCADE,
-    ticker TEXT NOT NULL,
-    summary_json TEXT NOT NULL,
-    model TEXT NOT NULL,
-    prompt_version TEXT NOT NULL,
-    analysis_mode TEXT NOT NULL DEFAULT 'full',
-    triage_json TEXT,
-    updated_at TEXT NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS llm_audits (
-    audit_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    stage TEXT NOT NULL,
-    schema_name TEXT NOT NULL,
-    ticker TEXT,
-    announcement_id TEXT,
-    attachment_url TEXT,
-    filename TEXT,
-    window_start TEXT,
-    window_end TEXT,
-    chunk_index INTEGER,
-    chunk_count INTEGER,
-    attempt INTEGER NOT NULL DEFAULT 1,
-    model TEXT NOT NULL,
-    prompt_version TEXT,
-    prompt_profile TEXT,
-    system_prompt TEXT NOT NULL,
-    user_prompt TEXT NOT NULL,
-    raw_response TEXT,
-    parsed_json TEXT,
-    status TEXT NOT NULL,
-    error TEXT,
-    started_at TEXT NOT NULL,
-    finished_at TEXT NOT NULL,
-    elapsed_seconds REAL NOT NULL,
-    prompt_tokens INTEGER,
-    completion_tokens INTEGER,
-    total_tokens INTEGER
-);
-CREATE INDEX IF NOT EXISTS idx_llm_audits_ticker_time
-    ON llm_audits(ticker, started_at);
-CREATE INDEX IF NOT EXISTS idx_llm_audits_announcement
-    ON llm_audits(announcement_id);
-
-CREATE TABLE IF NOT EXISTS company_window_summaries (
-    ticker TEXT NOT NULL,
-    start_at TEXT NOT NULL,
-    end_at TEXT NOT NULL,
-    summary_json TEXT NOT NULL,
-    model TEXT NOT NULL,
-    prompt_version TEXT NOT NULL,
-    input_fingerprint TEXT,
-    generation_mode TEXT NOT NULL DEFAULT 'llm',
-    source_announcement_count INTEGER,
-    updated_at TEXT NOT NULL,
-    PRIMARY KEY (ticker, start_at, end_at)
-);
-"""
+from .db_schema import initialize_schema
 
 
 def utc_now() -> str:
@@ -160,32 +19,7 @@ class Database:
         path.parent.mkdir(parents=True, exist_ok=True)
         self.path = path
         with self.connect() as conn:
-            conn.executescript(SCHEMA)
-            columns = {row[1] for row in conn.execute("PRAGMA table_info(attachments)").fetchall()}
-            if "downloaded_at" not in columns:
-                conn.execute("ALTER TABLE attachments ADD COLUMN downloaded_at TEXT")
-            if "extracted_at" not in columns:
-                conn.execute("ALTER TABLE attachments ADD COLUMN extracted_at TEXT")
-            if "selected_for_analysis" not in columns:
-                conn.execute("ALTER TABLE attachments ADD COLUMN selected_for_analysis INTEGER NOT NULL DEFAULT 1")
-            if "selection_reason" not in columns:
-                conn.execute("ALTER TABLE attachments ADD COLUMN selection_reason TEXT")
-            if "selection_category" not in columns:
-                conn.execute("ALTER TABLE attachments ADD COLUMN selection_category TEXT")
-            if "duplicate_of_url" not in columns:
-                conn.execute("ALTER TABLE attachments ADD COLUMN duplicate_of_url TEXT")
-            announcement_columns = {row[1] for row in conn.execute("PRAGMA table_info(announcement_summaries)").fetchall()}
-            if "analysis_mode" not in announcement_columns:
-                conn.execute("ALTER TABLE announcement_summaries ADD COLUMN analysis_mode TEXT NOT NULL DEFAULT 'full'")
-            if "triage_json" not in announcement_columns:
-                conn.execute("ALTER TABLE announcement_summaries ADD COLUMN triage_json TEXT")
-            company_columns = {row[1] for row in conn.execute("PRAGMA table_info(company_window_summaries)").fetchall()}
-            if "input_fingerprint" not in company_columns:
-                conn.execute("ALTER TABLE company_window_summaries ADD COLUMN input_fingerprint TEXT")
-            if "generation_mode" not in company_columns:
-                conn.execute("ALTER TABLE company_window_summaries ADD COLUMN generation_mode TEXT NOT NULL DEFAULT 'llm'")
-            if "source_announcement_count" not in company_columns:
-                conn.execute("ALTER TABLE company_window_summaries ADD COLUMN source_announcement_count INTEGER")
+            initialize_schema(conn)
 
     @contextmanager
     def connect(self) -> Iterator[sqlite3.Connection]:
@@ -386,34 +220,76 @@ class Database:
         selection_reason: str | None = None,
         selection_category: str | None = None,
     ) -> None:
-        with self.connect() as conn:
-            conn.execute(
-                """
-                INSERT INTO attachments (
-                    url, announcement_id, original_filename, is_attachment,
-                    selected_for_analysis, selection_reason, selection_category, duplicate_of_url, updated_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, NULL, ?)
-                ON CONFLICT(url) DO UPDATE SET
-                    announcement_id=excluded.announcement_id,
-                    original_filename=excluded.original_filename,
-                    is_attachment=excluded.is_attachment,
-                    selected_for_analysis=excluded.selected_for_analysis,
-                    selection_reason=excluded.selection_reason,
-                    selection_category=excluded.selection_category,
-                    duplicate_of_url=NULL,
-                    updated_at=excluded.updated_at
-                """,
+        self.upsert_attachments(
+            announcement_id,
+            [
                 (
-                    attachment["FullSavePath"],
-                    announcement_id,
-                    attachment.get("OriginalFilename") or attachment.get("PDFFilename") or "attachment",
-                    int(bool(attachment.get("IsAttachment"))),
-                    int(bool(selected_for_analysis)),
+                    attachment,
+                    selected_for_analysis,
                     selection_reason,
                     selection_category,
-                    utc_now(),
-                ),
-            )
+                )
+            ],
+        )
+
+    def upsert_attachments(
+        self,
+        announcement_id: str,
+        attachments: Iterable[
+            tuple[dict[str, Any], bool, str | None, str | None]
+        ],
+    ) -> bool:
+        """Upsert one announcement's attachments in a single transaction.
+
+        Returns whether an existing attachment changed its analysis selection.
+        """
+
+        records = list(attachments)
+        if not records:
+            return False
+
+        selection_changed = False
+        timestamp = utc_now()
+        with self.connect() as conn:
+            for attachment, selected, reason, category in records:
+                url = str(attachment["FullSavePath"])
+                previous = conn.execute(
+                    "SELECT selected_for_analysis FROM attachments WHERE url=?",
+                    (url,),
+                ).fetchone()
+                if previous is not None and bool(previous["selected_for_analysis"]) != selected:
+                    selection_changed = True
+                conn.execute(
+                    """
+                    INSERT INTO attachments (
+                        url, announcement_id, original_filename, is_attachment,
+                        selected_for_analysis, selection_reason, selection_category,
+                        duplicate_of_url, updated_at
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, NULL, ?)
+                    ON CONFLICT(url) DO UPDATE SET
+                        announcement_id=excluded.announcement_id,
+                        original_filename=excluded.original_filename,
+                        is_attachment=excluded.is_attachment,
+                        selected_for_analysis=excluded.selected_for_analysis,
+                        selection_reason=excluded.selection_reason,
+                        selection_category=excluded.selection_category,
+                        duplicate_of_url=NULL,
+                        updated_at=excluded.updated_at
+                    """,
+                    (
+                        url,
+                        announcement_id,
+                        attachment.get("OriginalFilename")
+                        or attachment.get("PDFFilename")
+                        or "attachment",
+                        int(bool(attachment.get("IsAttachment"))),
+                        int(selected),
+                        reason,
+                        category,
+                        timestamp,
+                    ),
+                )
+        return selection_changed
 
     def attachment_state(self, url: str) -> sqlite3.Row | None:
         with self.connect() as conn:

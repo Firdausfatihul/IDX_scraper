@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import json
-import threading
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from types import SimpleNamespace
@@ -123,7 +122,6 @@ def test_xlsx_primary_sheets_are_ranked_and_formula_fallback_is_visible(tmp_path
 
 
 def test_same_window_rerun_reuses_company_fingerprint(tmp_path: Path, monkeypatch) -> None:
-    import time
     import idx_digest.pipeline as pipeline_module
     from idx_digest.pipeline import Pipeline, PreparedAttachment
 

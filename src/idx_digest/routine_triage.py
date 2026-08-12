@@ -4,7 +4,6 @@ import re
 from dataclasses import dataclass
 from typing import Any, Iterable
 
-
 _ROUTINE_TITLE_RE = re.compile(r"\blaporan\s+bulanan\s+registrasi\s+pemegang\s+efek\b", re.I)
 _HIGH_RISK_PATTERNS: tuple[tuple[str, re.Pattern[str]], ...] = (
     ("control-change", re.compile(r"perubahan\s+(?:pemegang\s+saham\s+)?pengendali|pengambilalihan|menjadi\s+pengendali|tidak\s+lagi\s+menjadi\s+pengendali", re.I)),

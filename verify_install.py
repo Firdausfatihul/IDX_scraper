@@ -3,6 +3,10 @@ from __future__ import annotations
 import importlib
 from importlib.resources import files
 
+import idx_digest
+from idx_digest.config import Settings
+from idx_digest.prompts import PromptStore
+
 MODULES = [
     "idx_digest",
     "idx_digest.cli",
@@ -30,13 +34,19 @@ MODULES = [
     "idx_digest.routine_triage",
     "idx_digest.provider_gate",
     "idx_digest.performance_advisor",
+    "idx_digest.disclosure_classifier",
+    "idx_digest.incremental",
+    "idx_digest.network_watchdog",
+    "idx_digest.stock_master",
+    "idx_digest.db_schema",
+    "idx_digest.gui_models",
+    "idx_digest.summary_schemas",
 ]
 
 for name in MODULES:
     module = importlib.import_module(name)
     print(f"OK {name}: {module.__file__}")
 
-import idx_digest
 assert idx_digest.__version__ == "0.15.5", idx_digest.__version__
 print(f"VERSION {idx_digest.__version__}")
 
@@ -81,8 +91,6 @@ assert "Inspect ticker" in asset_text
 assert "Ticker inspector" in asset_text
 print(f"OK GUI asset: {asset}")
 
-from idx_digest.config import Settings
-from idx_digest.prompts import PromptStore
 settings = Settings(_env_file=None)
 assert settings.idx_wide_page_probe_size >= settings.idx_page_size
 assert settings.idx_wide_page_probe_max_size >= settings.idx_wide_page_probe_size

@@ -9,7 +9,6 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Mapping
 
-
 PROMPT_FILE_VERSION = 3
 DEFAULT_PROFILE_NAME = "Corporate actions & expansion"
 PROMPT_KEYS = (
