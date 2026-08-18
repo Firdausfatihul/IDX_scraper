@@ -19,6 +19,8 @@ from .share_export import (
     SIGNALS_ONLY_SECTIONS,
     default_share_filename,
     load_share_bundle,
+    load_share_bundle_range,
+    share_filename_dates,
     write_share_export,
 )
 from .timeutils import parse_boundary
@@ -360,8 +362,8 @@ def recover(
 
 @app.command("export-all")
 def export_all(
-    start: str = typer.Option(..., help="Exact ISO start date/datetime of saved company digests."),
-    end: str = typer.Option(..., help="Exact ISO end date/datetime of saved company digests."),
+    start: str | None = typer.Option(None, help="ISO start date/datetime. Omit only with --all-dates."),
+    end: str | None = typer.Option(None, help="ISO end date/datetime. Omit only with --all-dates."),
     ticker: str | None = typer.Option(None, help="Optional one-ticker export. Omit for every company in the window."),
     format: str = typer.Option("md", "--format", "-f", help="Output format: md, txt, or json."),
     sections: str | None = typer.Option(
@@ -374,6 +376,21 @@ def export_all(
         "--signals-only",
         help="Share only the corporate-action/expansion signal sections plus overview and monitoring.",
     ),
+    date_range: bool = typer.Option(
+        False,
+        "--range",
+        help="Take every saved digest window overlapping --start..--end instead of one exact window.",
+    ),
+    all_dates: bool = typer.Option(
+        False,
+        "--all-dates",
+        help="Export every saved digest window, ignoring --start/--end.",
+    ),
+    every_window: bool = typer.Option(
+        False,
+        "--every-window",
+        help="With --range/--all-dates, keep each company's every window instead of only its newest.",
+    ),
     destination: Path | None = typer.Option(
         None,
         "--destination",
@@ -383,10 +400,12 @@ def export_all(
 ) -> None:
     """Append saved per-company digests into one shareable file, without any LLM call."""
     settings = Settings()
-    start_at = parse_boundary(start, settings.app_timezone, is_end=False)
-    end_at = parse_boundary(end, settings.app_timezone, is_end=True)
     if signals_only and sections:
         raise typer.BadParameter("Use either --signals-only or --sections, not both")
+    if date_range and all_dates:
+        raise typer.BadParameter("Use either --range or --all-dates, not both")
+    if not all_dates and (not start or not end):
+        raise typer.BadParameter("--start and --end are required unless --all-dates is given")
     selected_sections = (
         SIGNALS_ONLY_SECTIONS
         if signals_only
@@ -398,18 +417,42 @@ def export_all(
     if normalized_format not in {"md", "markdown", "txt", "text", "json"}:
         raise typer.BadParameter("--format must be md, txt, or json")
     normalized_ticker = (ticker or "").strip().upper() or None
-    bundle = load_share_bundle(
-        settings.database_path,
-        start_at=start_at.isoformat(),
-        end_at=end_at.isoformat(),
-        ticker=normalized_ticker,
-        sections=selected_sections,
-    )
+    per_ticker = "all" if every_window else "latest"
+
+    if all_dates:
+        bundle = load_share_bundle_range(
+            settings.database_path,
+            ticker=normalized_ticker,
+            sections=selected_sections,
+            per_ticker=per_ticker,
+            assume_timezone=settings.app_timezone,
+        )
+        empty_message = "No saved company summaries exist yet"
+    else:
+        start_at = parse_boundary(str(start), settings.app_timezone, is_end=False)
+        end_at = parse_boundary(str(end), settings.app_timezone, is_end=True)
+        if end_at < start_at:
+            raise typer.BadParameter("--end must not precede --start")
+        loader = load_share_bundle_range if date_range else load_share_bundle
+        extra = {"per_ticker": per_ticker, "assume_timezone": settings.app_timezone} if date_range else {}
+        bundle = loader(
+            settings.database_path,
+            start_at=start_at.isoformat(),
+            end_at=end_at.isoformat(),
+            ticker=normalized_ticker,
+            sections=selected_sections,
+            **extra,
+        )
+        empty_message = (
+            "No saved company digests overlap these dates"
+            if date_range
+            else "No saved company summaries found for this exact window"
+        )
     if not bundle.companies:
-        raise typer.BadParameter("No saved company summaries found for this exact window")
+        raise typer.BadParameter(empty_message)
     if destination is None:
         destination = settings.data_dir / "share" / default_share_filename(
-            normalized_format, ticker=normalized_ticker
+            normalized_format, ticker=normalized_ticker, dates=share_filename_dates(bundle)
         )
     write_share_export(bundle, destination, fmt=normalized_format)
     typer.echo(json.dumps({
@@ -417,6 +460,8 @@ def export_all(
         "company_count": bundle.company_count,
         "sections": list(bundle.sections),
         "format": normalized_format,
+        "date_mode": bundle.date_mode,
+        "window_count": len(bundle.window_keys) or 1,
         "llm_calls": 0,
     }, ensure_ascii=False, indent=2))
 

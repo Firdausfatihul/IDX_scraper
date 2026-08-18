@@ -17,11 +17,11 @@
       --visited:#ff9595; --rule:#757898; --rule-soft:#34384b; --muted:#a2a5bd; --green:#77d5a8;
       --amber:#eac16c; --red:#ff8f8f; --white:#151824; --shadow:0 12px 30px rgba(0,0,0,.24);
     }
-    *{box-sizing:border-box} html{scroll-behavior:smooth} body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:14px;line-height:1.45}
+    *{box-sizing:border-box} [hidden]{display:none!important} html{scroll-behavior:smooth} body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:14px;line-height:1.45}
     button,input,select,textarea{font:inherit;color:inherit} button{cursor:pointer} a{color:var(--link)} a:visited{color:var(--visited)}
     .shell{max-width:1500px;margin:0 auto;padding:18px 24px 36px}.masthead{text-align:center;padding:6px 0 10px}.masthead h1{margin:0;font-family:var(--serif);font-size:29px;letter-spacing:.02em}.masthead h1 .cap{font-size:1.42em;line-height:.8}.masthead .address{font-family:var(--serif);font-size:12px;margin-top:3px}.masthead .subtitle{font-family:var(--serif);font-weight:700;margin-top:3px}.rule{border:0;border-top:1px solid var(--rule);margin:8px 0}
     .utility{display:grid;grid-template-columns:minmax(280px,1fr) auto auto;gap:12px;align-items:center;padding:6px 0}.profile-tools,.server-tools{display:flex;align-items:center;gap:7px;flex-wrap:wrap}.server-tools{justify-content:flex-end}.profile-label{font:700 10px/1 var(--sans);text-transform:uppercase;letter-spacing:.09em;color:var(--muted)}
-    select,input[type="text"],input[type="number"],input[type="datetime-local"],textarea{background:var(--white);border:1px solid var(--rule-soft);border-radius:3px;padding:8px 9px;outline:none} select:focus,input:focus,textarea:focus{border-color:var(--ink);box-shadow:0 0 0 2px color-mix(in srgb,var(--ink) 10%,transparent)}
+    select,input[type="text"],input[type="number"],input[type="datetime-local"],input[type="date"],textarea{background:var(--white);border:1px solid var(--rule-soft);border-radius:3px;padding:8px 9px;outline:none} select:focus,input:focus,textarea:focus{border-color:var(--ink);box-shadow:0 0 0 2px color-mix(in srgb,var(--ink) 10%,transparent)}
     .profile-select{min-width:190px;height:34px}.autosave{font:11px var(--mono);color:var(--muted)}.autosave.saving{color:var(--amber)}.autosave.saved{color:var(--green)}
     .status-pill,.model-pill{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--rule-soft);padding:5px 8px;background:var(--white);font-size:11px;white-space:nowrap}.dot{width:7px;height:7px;border-radius:50%;background:var(--muted)}.dot.ready,.dot.completed{background:var(--green)}.dot.running{background:#3454a4;animation:pulse 1.2s infinite}.dot.failed{background:var(--red)}@keyframes pulse{50%{opacity:.35}}
     .text-btn,.secondary,.primary,.danger-btn,.prompt-btn,.share-btn,.audit-btn,.link-btn,.nav-btn,.icon-btn{border:1px solid var(--rule);background:var(--white);color:var(--link);padding:7px 10px;border-radius:3px;text-decoration:none;font-size:12px;font-weight:700}.text-btn:hover,.secondary:hover,.prompt-btn:hover,.share-btn:hover,.audit-btn:hover,.nav-btn:hover,.link-btn:hover{background:var(--paper-2)}.primary{background:var(--ink);color:var(--paper);border-color:var(--ink)}.danger-btn{color:var(--red);border-color:color-mix(in srgb,var(--red) 55%,var(--rule-soft))}.icon-btn{width:34px;height:34px;padding:0;font-size:19px}.primary:disabled,.secondary:disabled,.audit-btn:disabled{opacity:.45;cursor:not-allowed}
@@ -49,17 +49,18 @@
     .toast{position:fixed;right:20px;bottom:20px;max-width:380px;padding:10px 12px;background:var(--ink);color:var(--paper);border:1px solid var(--rule);box-shadow:var(--shadow);font-size:12px;opacity:0;transform:translateY(10px);pointer-events:none;transition:.18s;z-index:100}.toast.show{opacity:1;transform:none}.toast.error{background:var(--red)}
     .modal-shell{position:fixed;inset:0;background:rgba(20,20,36,.48);display:none;place-items:center;padding:18px;z-index:50}.modal-shell.open{display:grid}.modal{width:min(1100px,96vw);max-height:92vh;background:var(--white);border:1px solid var(--rule);box-shadow:0 24px 80px rgba(0,0,0,.25);display:grid;grid-template-rows:auto minmax(0,1fr) auto}.modal-head,.modal-foot{padding:11px 13px;display:flex;justify-content:space-between;gap:12px;align-items:center;border-bottom:1px solid var(--rule)}.modal-foot{border-top:1px solid var(--rule);border-bottom:0}.modal-head h2{font:700 18px var(--serif);margin:0}.modal-head p,.modal-note{font-size:10px;color:var(--muted);margin:2px 0 0}.modal-body{min-height:0;display:grid;grid-template-columns:220px 1fr}.prompt-nav{border-right:1px solid var(--rule-soft);padding:8px;overflow:auto}.prompt-tab{display:block;width:100%;text-align:left;border:0;background:transparent;color:var(--link);padding:8px}.prompt-tab.active{background:var(--paper-2);color:var(--ink);font-weight:700}.prompt-editor{padding:12px;display:grid;grid-template-rows:auto auto minmax(300px,1fr);gap:9px;min-width:0}.prompt-meta{display:flex;justify-content:space-between;gap:12px}.prompt-meta h3{font:700 15px var(--serif);margin:0}.prompt-stats{font:10px var(--mono);color:var(--muted)}.profile-field{display:flex;gap:6px;align-items:center}.profile-field input{height:32px}.variables{display:flex;gap:4px;flex-wrap:wrap;font-size:9px;color:var(--muted)}.variable{border:1px solid var(--rule-soft);padding:2px 4px;font-family:var(--mono)}#promptText{width:100%;height:100%;min-height:330px;resize:none;font:11px/1.5 var(--mono)}.button-row{display:flex;gap:5px;flex-wrap:wrap}
     .share-modal{width:min(780px,96vw)}.share-body{padding:12px;overflow:auto}.share-scope,.share-status{padding:8px;border:1px solid var(--rule-soft);background:var(--paper);font-size:11px;margin-bottom:10px}.share-presets{display:flex;gap:5px;margin-bottom:10px}.share-preset{border:1px solid var(--rule-soft);background:var(--white);color:var(--link);padding:6px 8px}.share-preset.active{background:var(--paper-2);color:var(--ink);font-weight:700}.share-sections{display:grid;grid-template-columns:repeat(2,1fr);gap:5px}.share-check{display:flex;gap:6px;align-items:center;text-transform:none;letter-spacing:0;color:var(--ink);font-size:11px}
+    .share-dates{display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;margin-bottom:10px}.share-date{display:flex;flex:1 1 160px;flex-direction:column;gap:3px;font:700 9px/1 var(--sans);text-transform:uppercase;letter-spacing:.09em;color:var(--muted)}.share-date input{height:34px;width:100%}.share-windows{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px}.share-window{border:1px solid var(--rule-soft);background:var(--white);color:var(--link);padding:5px 8px;font-size:10px;text-align:left;line-height:1.35}.share-window:hover{background:var(--paper-2)}.share-window.active{background:var(--paper-2);color:var(--ink);border-color:var(--ink)}.share-window b{display:block;font-size:11px}.share-empty{font-size:10px;color:var(--muted)}#shareEveryWindowRow{margin-bottom:10px}#shareEveryWindow{width:auto;flex:0 0 auto}
     .audit-modal{width:min(1250px,97vw);height:min(900px,94vh);grid-template-rows:auto auto minmax(0,1fr)}.audit-tabs{display:flex;gap:2px;padding:5px;border-bottom:1px solid var(--rule);overflow:auto}.audit-body{padding:12px;overflow:auto}.audit-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.audit-card{border:1px solid var(--rule-soft);background:var(--paper);padding:9px}.audit-card h4{font:700 14px var(--serif);margin:0 0 5px}.audit-card p{font-size:10px;margin:4px 0;color:var(--ink-2)}.audit-meta{display:flex;gap:4px;flex-wrap:wrap}.audit-badge{border:1px solid var(--rule-soft);padding:2px 4px;font:9px var(--mono);color:var(--muted)}.audit-badge.exact{color:var(--green)}.audit-badge.inferred{color:var(--amber)}.audit-step{display:grid;grid-template-columns:175px 1fr auto;gap:8px;padding:7px;border-bottom:1px dotted var(--rule-soft)}.audit-step time{font:9px var(--mono);color:var(--muted)}.audit-step strong{display:block;font-size:11px}.audit-step span{font-size:10px;color:var(--muted)}.source-row{border-top:1px dotted var(--rule-soft);margin-top:7px;padding-top:7px}.source-links{display:flex;gap:6px;flex-wrap:wrap}.source-link{font-size:10px}.audit-details{border:1px solid var(--rule-soft);margin-bottom:7px}.audit-details summary{cursor:pointer;padding:8px;display:flex;justify-content:space-between;gap:10px;font-size:10px}.audit-details-body{padding:8px;display:grid;gap:8px}.prompt-block h5{margin:0 0 3px;text-transform:uppercase;font-size:9px;color:var(--muted)}.audit-notice{padding:8px;border:1px solid var(--rule-soft);background:var(--paper);font-size:10px;margin-bottom:8px}.scenario-badge{display:inline-block;border:1px solid var(--rule-soft);padding:2px 4px;font:9px var(--mono);margin-bottom:5px}
     .profile-modal{width:min(560px,94vw)}.profile-form{padding:14px}.checkline{display:flex;align-items:center;gap:7px;font-size:11px;margin:8px 0}.checkline input{width:auto}.profile-note{font-size:10px;color:var(--muted);padding:8px;background:var(--paper);border:1px solid var(--rule-soft)}
     /* v0.14.1 responsive containment: dynamic machine text must never grow the page. */
     html,body{width:100%;max-width:100%;overflow-x:hidden}.shell{width:100%;max-width:1500px;min-width:0}.workspace-view,.desk-grid,.left-rail,.main-stack,.panel,.panel-head,.panel-body,.hero>*,.metrics>*,.observatory-grid>*,.work-grid>*,.library-grid>*,.activity-grid>*,.result-head>*,.result-actions,.modal,.modal-head>*,.modal-foot>*,.modal-body>*,.prompt-editor,.audit-body,.audit-card,.audit-step>*,.activity-event>*{min-width:0;max-width:100%}
     .desk-grid{grid-template-columns:330px minmax(0,1fr)}.field-row,.work-grid,.library-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.metrics{grid-template-columns:repeat(4,minmax(0,1fr))}.hero{grid-template-columns:minmax(0,1fr) auto}.activity-grid{grid-template-columns:300px minmax(0,1fr)}.activity-event{grid-template-columns:72px 90px minmax(0,1fr)}.slow-row{grid-template-columns:minmax(0,1fr) 70px}.audit-step{grid-template-columns:175px minmax(0,1fr) auto}
-    input,select,textarea,button{max-width:100%}input,select,textarea{min-width:0}.profile-tools,.server-tools,.result-actions,.company-toolbar,.share-presets,.button-row{min-width:0}.profile-select{max-width:100%}.model-pill,.status-pill{min-width:0;max-width:100%;overflow:hidden;text-overflow:ellipsis}.model-pill{max-width:min(34vw,360px)}
+    input,select,textarea,button{max-width:100%}input,select,textarea{min-width:0}.profile-tools,.server-tools,.result-actions,.company-toolbar,.share-presets,.share-dates,.share-windows,.button-row{min-width:0}.profile-select{max-width:100%}.model-pill,.status-pill{min-width:0;max-width:100%;overflow:hidden;text-overflow:ellipsis}.model-pill{max-width:min(34vw,360px)}
     .panel,.result-body,.overview,.result-card,.chip,.task,.log,.activity-run,.activity-meta,.activity-event,.audit-card,.audit-step,.audit-details,.audit-details summary,.source-row,.advisor-copy,.config-item,.library-hero,.section-title{overflow-wrap:anywhere;word-break:break-word}.log>div:last-child,.activity-event>div:last-child,.activity-event .autosave,.audit-body .autosave,.audit-details summary span,.source-link,.audit-card p,.audit-step span{min-width:0;overflow-wrap:anywhere;word-break:break-word;white-space:normal}.config-list{grid-template-columns:minmax(0,1fr)}.config-item{width:100%;min-width:0;max-width:100%}.config-item span{min-width:0}.config-item span:first-child{flex:0 0 auto}.config-item span:last-child{flex:0 1 190px;max-width:60%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.task-name{min-width:0}.overview{width:100%}
     .ledger-wrap{width:100%;max-width:100%;overflow-x:auto;overscroll-behavior-inline:contain;-webkit-overflow-scrolling:touch}.ledger{min-width:620px;table-layout:fixed}.ledger th,.ledger td{overflow-wrap:anywhere;word-break:break-word}.ledger th:nth-child(1){width:38%}.ledger th:nth-child(2){width:16%}.ledger th:nth-child(3){width:26%}.ledger th:nth-child(4){width:20%}
-    .modal-shell{padding:clamp(8px,2vw,18px);overflow:auto;align-items:center;justify-items:center}.modal,.share-modal,.profile-modal,.audit-modal{width:100%;max-width:100%}.modal{max-width:1100px;max-height:calc(100dvh - 16px)}.share-modal{max-width:780px}.profile-modal{max-width:560px}.audit-modal{max-width:1250px;height:min(900px,calc(100dvh - 16px))}.modal-head,.modal-foot{min-width:0}.prompt-meta{min-width:0;flex-wrap:wrap}.profile-field{min-width:0;flex-wrap:wrap}.profile-field input{flex:1 1 220px}.share-presets{flex-wrap:wrap}.audit-details summary{align-items:flex-start}.toast{right:clamp(8px,2vw,20px);max-width:min(380px,calc(100vw - 16px))}
+    .modal-shell{padding:clamp(8px,2vw,18px);overflow:auto;align-items:center;justify-items:center}.modal,.share-modal,.profile-modal,.audit-modal{width:100%;max-width:100%}.modal{max-width:1100px;max-height:calc(100dvh - 16px)}.share-modal{max-width:780px}.profile-modal{max-width:560px}.audit-modal{max-width:1250px;height:min(900px,calc(100dvh - 16px))}.modal-head,.modal-foot{min-width:0}.prompt-meta{min-width:0;flex-wrap:wrap}.profile-field{min-width:0;flex-wrap:wrap}.profile-field input{flex:1 1 220px}.share-presets,.share-dates,.share-windows{flex-wrap:wrap}.audit-details summary{align-items:flex-start}.toast{right:clamp(8px,2vw,20px);max-width:min(380px,calc(100vw - 16px))}
     @media(max-width:1100px){.observatory-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.obs-card:nth-child(3){border-right:0}.desk-grid{grid-template-columns:minmax(0,1fr)}.left-rail{position:static;grid-template-columns:repeat(2,minmax(0,1fr))}.company-index{grid-template-columns:repeat(3,minmax(0,1fr))}.library-grid{grid-template-columns:minmax(0,1fr)}.utility{grid-template-columns:minmax(0,1fr) auto}.profile-tools{grid-column:1/-1}.model-pill{justify-self:start;max-width:100%}.server-tools{justify-content:flex-end}}
-    @media(max-width:760px){.observatory-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.obs-card:nth-child(odd){border-right:1px dotted var(--rule-soft)}.obs-card:nth-child(even){border-right:0}.advisor-row{align-items:flex-start;flex-direction:column}.shell{padding:10px}.utility{grid-template-columns:minmax(0,1fr)}.profile-tools,.server-tools{width:100%;justify-content:flex-start}.model-pill{justify-self:stretch;width:100%;max-width:100%}.nav{justify-content:flex-start;overflow-x:auto;max-width:100%;scrollbar-width:thin}.left-rail{grid-template-columns:minmax(0,1fr)}.metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.work-grid,.result-grid,.audit-grid{grid-template-columns:minmax(0,1fr)}.company-index{grid-template-columns:repeat(2,minmax(0,1fr))}.activity-grid{grid-template-columns:minmax(0,1fr)}.modal-body{grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr)}.prompt-nav{border-right:0;border-bottom:1px solid var(--rule-soft);display:flex;overflow-x:auto;max-width:100%}.prompt-tab{min-width:150px}.audit-step{grid-template-columns:minmax(0,1fr)}.activity-event{grid-template-columns:minmax(0,1fr)}.masthead h1{font-size:23px}.hero{grid-template-columns:minmax(0,1fr)}.hero-state{text-align:left}.result-head,.library-hero,.section-title{align-items:flex-start;flex-direction:column}.result-actions{width:100%}.result-actions>button{flex:1 1 150px}.company-toolbar{flex-wrap:wrap}.company-toolbar input{width:100%;max-width:none}.modal-head,.modal-foot{align-items:flex-start;flex-wrap:wrap}.share-sections{grid-template-columns:minmax(0,1fr)}}
+    @media(max-width:760px){.observatory-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.obs-card:nth-child(odd){border-right:1px dotted var(--rule-soft)}.obs-card:nth-child(even){border-right:0}.advisor-row{align-items:flex-start;flex-direction:column}.shell{padding:10px}.utility{grid-template-columns:minmax(0,1fr)}.profile-tools,.server-tools{width:100%;justify-content:flex-start}.model-pill{justify-self:stretch;width:100%;max-width:100%}.nav{justify-content:flex-start;overflow-x:auto;max-width:100%;scrollbar-width:thin}.left-rail{grid-template-columns:minmax(0,1fr)}.metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.work-grid,.result-grid,.audit-grid{grid-template-columns:minmax(0,1fr)}.company-index{grid-template-columns:repeat(2,minmax(0,1fr))}.activity-grid{grid-template-columns:minmax(0,1fr)}.modal-body{grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr)}.prompt-nav{border-right:0;border-bottom:1px solid var(--rule-soft);display:flex;overflow-x:auto;max-width:100%}.prompt-tab{min-width:150px}.audit-step{grid-template-columns:minmax(0,1fr)}.activity-event{grid-template-columns:minmax(0,1fr)}.masthead h1{font-size:23px}.hero{grid-template-columns:minmax(0,1fr)}.hero-state{text-align:left}.result-head,.library-hero,.section-title{align-items:flex-start;flex-direction:column}.result-actions{width:100%}.result-actions>button{flex:1 1 150px}.company-toolbar{flex-wrap:wrap}.company-toolbar input{width:100%;max-width:none}.modal-head,.modal-foot{align-items:flex-start;flex-wrap:wrap}.share-sections{grid-template-columns:minmax(0,1fr)}.share-date{flex:1 1 100%}.share-window{flex:1 1 100%}}
     @media(max-width:520px){.llm-request-meta,.chunk-doc-meta{grid-template-columns:minmax(0,1fr)}.ledger-summary{align-items:flex-start;flex-direction:column}.shell{padding:8px}.masthead{padding-top:2px}.masthead h1{font-size:20px}.field-row{grid-template-columns:minmax(0,1fr)}.metrics,.observatory-grid,.company-index{grid-template-columns:minmax(0,1fr)}.obs-card{border-right:0!important;border-bottom:1px dotted var(--rule-soft)}.obs-card:last-child{border-bottom:0}.profile-tools{display:grid;grid-template-columns:minmax(0,1fr)}.profile-select,.profile-tools .text-btn{width:100%}.server-tools{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center}.server-tools .status-pill,.server-tools .prompt-btn{width:100%}.server-tools .status-pill{grid-column:1/-1}.nav-btn{padding-inline:12px}.hero{padding:13px}.hero h2,.library-hero h2{font-size:21px}.elapsed{font-size:22px}.result-body,.panel-body,.audit-body,.prompt-editor{padding:10px}.ledger{min-width:560px}.modal-shell{padding:6px}.audit-modal{height:calc(100dvh - 12px)}#promptText{min-height:260px}.toast{left:8px;right:8px;bottom:8px;max-width:none}}
   </style>
 </head>
@@ -235,8 +236,8 @@
 <div class="modal-shell" id="shareModal" aria-hidden="true">
   <section class="modal share-modal" role="dialog" aria-modal="true" aria-labelledby="shareModalTitle">
     <div class="modal-head"><div><h2 id="shareModalTitle">Share company digests</h2><p>Append saved ticker summaries into one friend-ready file. Zero LLM calls.</p></div><button class="icon-btn" id="shareClose" type="button">×</button></div>
-    <div class="share-body"><div class="share-scope" id="shareScope"></div><div class="field"><label>Quick selection</label></div><div class="share-presets"><button class="share-preset active" id="sharePresetFriend" type="button">Friend-ready</button><button class="share-preset" id="sharePresetSignals" type="button">Signals only</button><button class="share-preset" id="sharePresetFull" type="button">Everything</button></div><div class="field"><label>Sections</label></div><div class="share-sections" id="shareSections"></div><div class="share-status" id="shareStatus">No cross-company analysis. Tickers are appended alphabetically.</div></div>
-    <div class="modal-foot"><div class="modal-note">Uses saved company-window summaries only. No IDX or OpenRouter calls.</div><div class="button-row"><button class="secondary" id="shareTxt" type="button">TXT</button><button class="secondary" id="shareMd" type="button">Markdown</button><button class="primary" id="shareCopy" type="button">Copy all</button></div></div>
+    <div class="share-body"><div class="share-scope" id="shareScope"></div><div class="field"><label>Dates to export</label></div><div class="share-presets"><button class="share-preset active" id="shareDatesScope" type="button">Current scope</button><button class="share-preset" id="shareDatesRange" type="button">Pick dates</button><button class="share-preset" id="shareDatesAll" type="button">All saved dates</button></div><div class="share-dates" id="shareDateRow" hidden><label class="share-date" for="shareStartDate"><span>From</span><input id="shareStartDate" type="date"></label><label class="share-date" for="shareEndDate"><span>To</span><input id="shareEndDate" type="date"></label><button class="share-preset" id="shareDatesSpan" type="button">Full saved span</button></div><div class="field"><label>Saved windows · click to include or exclude</label></div><div class="share-windows" id="shareWindows"></div><label class="share-check" id="shareEveryWindowRow" hidden><input type="checkbox" id="shareEveryWindow"><span>Keep every saved window per ticker (a company may appear more than once)</span></label><div class="field"><label>Quick selection</label></div><div class="share-presets"><button class="share-preset active" id="sharePresetFriend" type="button">Friend-ready</button><button class="share-preset" id="sharePresetSignals" type="button">Signals only</button><button class="share-preset" id="sharePresetFull" type="button">Everything</button></div><div class="field"><label>Sections</label></div><div class="share-sections" id="shareSections"></div><div class="share-status" id="shareStatus">No cross-company analysis. Tickers are appended alphabetically.</div></div>
+    <div class="modal-foot"><div class="modal-note">Uses saved company-window summaries only. No IDX or OpenRouter calls. Digests exist per saved run window, so picked dates preselect every window they touch — click a window to include or exclude it.</div><div class="button-row"><button class="secondary" id="shareTxt" type="button">TXT</button><button class="secondary" id="shareMd" type="button">Markdown</button><button class="primary" id="shareCopy" type="button">Copy all</button></div></div>
   </section>
 </div>
 
@@ -941,21 +942,137 @@
     });
     [['sharePresetFriend','friend'],['sharePresetSignals','signals'],['sharePresetFull','full']].forEach(([id,preset]) => $(id).classList.toggle('active', preset === name));
   }
+  const shareDates = {mode:'scope', windows:[], span:null, selected:new Set()};
+  const windowKey = w => `${w.start_at}\u0000${w.end_at}`;
+  function selectedShareWindows() {
+    return shareDates.windows.filter(w => shareDates.selected.has(windowKey(w)));
+  }
+  function overlappingSavedWindows(startDate, endDate) {
+    if (!startDate || !endDate) return [];
+    return shareDates.windows.filter(w => w.start_date <= endDate && w.end_date >= startDate);
+  }
+  function exactScopeWindows() {
+    const scope = currentResultScope();
+    const start = (scope.start || '').slice(0,10), end = (scope.end || '').slice(0,10);
+    return shareDates.windows.filter(w => w.start_date === start && w.end_date === end);
+  }
+  function selectShareWindows(list) {
+    shareDates.selected = new Set(list.map(windowKey));
+    updateShareScope();
+  }
+  function toggleShareWindow(w) {
+    const key = windowKey(w);
+    if (shareDates.selected.has(key)) shareDates.selected.delete(key); else shareDates.selected.add(key);
+    // Hand-picking a window is an explicit choice, so leave the exact-scope path.
+    if (shareDates.mode === 'scope') setShareDateMode('range', {keepSelection:true});
+    else updateShareScope();
+  }
+  function renderShareWindows() {
+    const host = $('shareWindows');
+    if (!shareDates.windows.length) {
+      host.innerHTML = `<span class="share-empty">${shareDates.span === null && shareDates.failed ? 'Could not read saved windows from the server.' : 'No saved company digests yet. Run a scrape first.'}</span>`;
+      return;
+    }
+    host.innerHTML = shareDates.windows.map((w,i) => `<button class="share-window" type="button" role="checkbox" aria-checked="false" data-share-window="${i}"><b>${escapeHtml(w.label)}</b>${w.company_count} ${w.company_count === 1 ? 'company' : 'companies'}</button>`).join('');
+    host.querySelectorAll('[data-share-window]').forEach(button => {
+      button.onclick = () => toggleShareWindow(shareDates.windows[Number(button.dataset.shareWindow)]);
+    });
+  }
+  function markActiveShareWindows() {
+    document.querySelectorAll('[data-share-window]').forEach(button => {
+      const chosen = shareDates.selected.has(windowKey(shareDates.windows[Number(button.dataset.shareWindow)]));
+      button.classList.toggle('active', chosen);
+      button.setAttribute('aria-checked', String(chosen));
+    });
+  }
+  function updateShareScope() {
+    const ticker = (currentResultScope().ticker || '').toUpperCase();
+    markActiveShareWindows();
+    const chosen = selectedShareWindows();
+    let dates, suffix = '';
+    if (shareDates.mode === 'scope') {
+      const scope = currentResultScope();
+      dates = `${scope.start || '\u2014'} \u2192 ${scope.end || '\u2014'}`;
+    } else {
+      const covered = chosen.length
+        ? `${chosen.reduce((a,w) => w.start_date < a ? w.start_date : a, chosen[0].start_date)} \u2192 ${chosen.reduce((a,w) => w.end_date > a ? w.end_date : a, chosen[0].end_date)}`
+        : 'nothing selected';
+      dates = shareDates.mode === 'all' ? `all saved dates \u00b7 ${covered}` : covered;
+      suffix = ` \u00b7 ${chosen.length} saved window${chosen.length === 1 ? '' : 's'}`;
+    }
+    $('shareScope').textContent = `${dates} \u00b7 ${ticker || 'all saved companies'} \u00b7 alphabetical ticker order${suffix}`;
+    const blocked = shareDates.mode !== 'scope' && !chosen.length;
+    ['shareCopy','shareMd','shareTxt'].forEach(id => { $(id).disabled = blocked; });
+    if (blocked) $('shareStatus').textContent = 'Select at least one saved window to export.';
+  }
+  function setShareDateMode(mode, opts) {
+    shareDates.mode = mode;
+    [['shareDatesScope','scope'],['shareDatesRange','range'],['shareDatesAll','all']].forEach(([id,name]) => {
+      $(id).classList.toggle('active', name === mode);
+      $(id).setAttribute('aria-pressed', String(name === mode));
+    });
+    $('shareDateRow').hidden = mode !== 'range';
+    $('shareEveryWindowRow').hidden = mode === 'scope';
+    if (opts?.keepSelection) { updateShareScope(); return; }
+    if (mode === 'all') selectShareWindows(shareDates.windows);
+    else if (mode === 'range') selectShareWindows(overlappingSavedWindows($('shareStartDate').value, $('shareEndDate').value));
+    else selectShareWindows(exactScopeWindows());
+  }
+  function applyShareSpan() {
+    if (!shareDates.span) return;
+    $('shareStartDate').value = shareDates.span.start_date;
+    $('shareEndDate').value = shareDates.span.end_date;
+    onShareRangeChanged();
+  }
+  function onShareRangeChanged() {
+    selectShareWindows(overlappingSavedWindows($('shareStartDate').value, $('shareEndDate').value));
+  }
+  async function loadShareWindows() {
+    try {
+      const res = await fetch('/api/share/windows');
+      const body = await res.json(); if (!res.ok) throw new Error(body.detail || 'Could not read saved windows');
+      shareDates.windows = body.windows || []; shareDates.span = body.span || null; shareDates.failed = false;
+    } catch (_) { shareDates.windows = []; shareDates.span = null; shareDates.failed = true; }
+    renderShareWindows();
+    const bounds = shareDates.span;
+    ['shareStartDate','shareEndDate'].forEach(id => {
+      $(id).min = bounds ? bounds.start_date : ''; $(id).max = bounds ? bounds.end_date : '';
+    });
+    const scope = currentResultScope();
+    $('shareStartDate').value = (scope.start || bounds?.start_date || '').slice(0,10);
+    $('shareEndDate').value = (scope.end || bounds?.end_date || '').slice(0,10);
+    setShareDateMode(shareDates.mode);
+  }
   function openSharePanel() {
     if (!$('shareSections').children.length) renderShareSections();
     setSharePreset('friend');
-    const scope = currentResultScope();
-    const ticker = (scope.ticker || '').toUpperCase();
-    $('shareScope').textContent = `${scope.start || '—'} → ${scope.end || '—'} · ${ticker || 'all saved companies'} · alphabetical ticker order`;
+    $('shareEveryWindow').checked = false;
+    setShareDateMode('scope');
     $('shareStatus').textContent = 'No cross-company analysis. Saved ticker digests are appended one after another.';
     $('shareModal').classList.add('open'); $('shareModal').setAttribute('aria-hidden','false');
+    loadShareWindows();
   }
   function closeSharePanel() { $('shareModal').classList.remove('open'); $('shareModal').setAttribute('aria-hidden','true'); }
   function sharePayload(format) {
     const sections = selectedShareSections();
     if (!sections.length) throw new Error('Select at least one section');
-    const scope = currentResultScope();
-    return {start:scope.start, end:scope.end, ticker:(scope.ticker || '').toUpperCase() || null, format, sections, signals_only:false};
+    const ticker = (currentResultScope().ticker || '').toUpperCase() || null;
+    if (shareDates.mode === 'scope') {
+      const scope = currentResultScope();
+      if (!scope.start || !scope.end) throw new Error('This result has no date scope. Pick dates instead.');
+      return {start:scope.start, end:scope.end, date_mode:'exact', ticker, format, sections, signals_only:false};
+    }
+    if (shareDates.mode === 'range' && $('shareStartDate').value > $('shareEndDate').value) throw new Error('The from date must not come after the to date');
+    const chosen = selectedShareWindows();
+    if (!chosen.length) throw new Error('Select at least one saved window');
+    return {
+      start:shareDates.mode === 'range' ? $('shareStartDate').value : '',
+      end:shareDates.mode === 'range' ? $('shareEndDate').value : '',
+      date_mode:shareDates.mode,
+      per_ticker:$('shareEveryWindow').checked ? 'all' : 'latest',
+      window_keys:chosen.map(w => [w.start_at, w.end_at]),
+      ticker, format, sections, signals_only:false
+    };
   }
   async function copyShare() {
     $('shareCopy').disabled = true;
@@ -966,7 +1083,8 @@
       catch (_) {
         const area=document.createElement('textarea'); area.value=body.text; area.style.position='fixed'; area.style.opacity='0'; document.body.appendChild(area); area.select(); document.execCommand('copy'); area.remove();
       }
-      $('shareStatus').textContent = `${body.company_count} companies · ${body.characters.toLocaleString()} characters · 0 LLM calls`;
+      const windows = body.date_mode === 'exact' ? '' : ` · ${body.window_count} saved window${body.window_count === 1 ? '' : 's'} (${body.covered_window})`;
+      $('shareStatus').textContent = `${body.company_count} companies · ${body.digest_count} digests${windows} · ${body.characters.toLocaleString()} characters · 0 LLM calls`;
       toast(`Copied ${body.company_count} company digests`);
     } catch (err) { toast(err.message, true); }
     finally { $('shareCopy').disabled = false; }
@@ -981,7 +1099,7 @@
       const match = disposition.match(/filename="?([^";]+)"?/i);
       const filename = match?.[1] || `idx-digest-all-companies.${format}`;
       const url=URL.createObjectURL(blob), a=document.createElement('a'); a.href=url; a.download=filename; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),500);
-      $('shareStatus').textContent = `${(blob.size/1024).toFixed(1)} KiB exported · 0 LLM calls`;
+      $('shareStatus').textContent = `${filename} · ${(blob.size/1024).toFixed(1)} KiB exported · 0 LLM calls`;
       toast(`Saved ${format.toUpperCase()} share file`);
     } catch (err) { toast(err.message, true); }
     finally { button.disabled = false; }
@@ -1291,6 +1409,8 @@
     $('inspectButton').onclick = openTickerInspector; $('auditClose').onclick = closeTickerInspector; $('shareButton').onclick = openSharePanel; $('shareClose').onclick = closeSharePanel; $('shareCopy').onclick = copyShare; $('shareMd').onclick = () => downloadShare('md'); $('shareTxt').onclick = () => downloadShare('txt');
     $('snapshotButton').onclick=()=>saveRunSnapshot(); $('saveSnapshotButton').onclick=()=>saveRunSnapshot(state.activityRunId); $('applyTuningButton').onclick=applyTuningRecommendation;
     $('sharePresetFriend').onclick = () => setSharePreset('friend'); $('sharePresetSignals').onclick = () => setSharePreset('signals'); $('sharePresetFull').onclick = () => setSharePreset('full');
+    $('shareDatesScope').onclick = () => setShareDateMode('scope'); $('shareDatesRange').onclick = () => setShareDateMode('range'); $('shareDatesAll').onclick = () => setShareDateMode('all');
+    $('shareDatesSpan').onclick = applyShareSpan; $('shareStartDate').onchange = onShareRangeChanged; $('shareEndDate').onchange = onShareRangeChanged;
     $('promptReset').onclick = () => resetPrompts([state.activePromptKey]); $('promptResetAll').onclick = () => { if (confirm('Reset all seven prompts to the corporate-action defaults?')) resetPrompts(null); };
     $('newProfileButton').onclick=openProfileModal; $('deleteProfileButton').onclick=deleteActiveProfile; $('profileClose').onclick=closeProfileModal; $('profileCancel').onclick=closeProfileModal; $('profileCreate').onclick=createProfile; $('profileSelect').onchange=e=>switchProfile(e.target.value);
     $('refreshLibraryButton').onclick=()=>refreshLibrary(); $('companySearch').addEventListener('input',renderCompanyIndex);

@@ -4,6 +4,20 @@ All notable changes and migration requirements are consolidated here. Upgrades p
 
 Use [INSTALLATION.md](INSTALLATION.md) for the current upgrade procedure. Historical archive/patch extraction commands have been removed because they no longer describe the current source tree.
 
+## Unreleased
+
+### Date picking for the share export
+
+- Added a date selector to the **Copy / export all** panel: *Current scope* (previous behaviour), *Pick dates* (calendar pickers), and *All saved dates*.
+- Listed every saved digest window with its company count, always visible and individually clickable. Picking dates preselects the windows they touch; clicking one includes or excludes it. Because saved windows overlap, a calendar range alone cannot always isolate one window — clicking can.
+- Reported the current selection live and disabled the export buttons when nothing is selected, so an empty pick fails before the user commits rather than as a 404.
+- Added `GET /api/share/windows`; `ShareRequest` gained `date_mode` (`exact`/`range`/`all`), `per_ticker` (`latest`/`all`), and `window_keys` for naming saved windows outright. Unknown window keys are ignored rather than widening the export.
+- Added `export-all --range`, `--all-dates`, and `--every-window` for the same selection from the CLI.
+- Range and all-dates exports advertise the span the selected digests actually **cover**, note the dates that were picked when those differ, and label every digest with its own window — a picked range routinely pulls in a window reaching outside it, and the artifact now says so. Export filenames carry the covered span.
+- When one company has several selected windows, its newest **covered period** wins, not its most recently regenerated row.
+
+Existing exact-window exports are byte-identical to before. No database migration.
+
 ## 0.15.5
 
 ### Coverage-aware incremental runs

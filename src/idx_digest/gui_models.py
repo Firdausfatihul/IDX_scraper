@@ -44,12 +44,19 @@ class PromptResetRequest(BaseModel):
 
 
 class ShareRequest(BaseModel):
-    start: str
-    end: str
+    start: str = ""
+    end: str = ""
     ticker: str | None = None
     format: Literal["md", "txt", "json"] = "md"
     sections: list[str] | None = None
     signals_only: bool = False
+    # "exact" keeps the legacy behaviour of matching one saved window key exactly.
+    # "range" selects every saved window overlapping start..end; "all" ignores both bounds.
+    date_mode: Literal["exact", "range", "all"] = "exact"
+    per_ticker: Literal["latest", "all"] = "latest"
+    # Exact (start_at, end_at) keys of the saved windows to export. When given, these
+    # replace the start/end selection so a caller can pick individual overlapping windows.
+    window_keys: list[tuple[str, str]] | None = None
 
 
 class CompanyDetailRequest(BaseModel):

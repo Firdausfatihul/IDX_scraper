@@ -149,6 +149,8 @@ Normal recovery choices are:
 
 Company exports and combined share files are written atomically, so readers do not observe a half-written artifact.
 
+A company digest is stored under the exact `(ticker, start_at, end_at)` window that produced it, so an export selects whole saved windows rather than slicing into them. A picked date range therefore takes every saved window it overlaps, and a company that was reduced in several overlapping windows contributes its newest one unless every window is requested. The selected window boundaries are printed in the export, so the reader always sees which period each digest actually covers. No LLM call is made at any point.
+
 ## 11. Successful completion and coverage commit
 
 Coverage is merged only after the applicable metadata gaps complete without errors and satisfy completeness checks. Partial runs retain all successful checkpoints but leave the unproven interval missing. The next run therefore retries the gap rather than silently skipping it.

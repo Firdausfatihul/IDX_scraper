@@ -682,6 +682,78 @@ class Database:
         return {str(row["ticker"]): json.loads(row["summary_json"]) for row in rows}
 
 
+    def saved_window_index(self) -> list[dict[str, Any]]:
+        """Every distinct saved company-digest window, oldest first.
+
+        Windows are stored under an exact (start_at, end_at) key, so date-range
+        exporting has to pick whole saved windows rather than slice into them.
+        """
+        with self.connect() as conn:
+            rows = conn.execute(
+                """
+                SELECT start_at, end_at, COUNT(*) AS company_count,
+                       MAX(updated_at) AS updated_at
+                FROM company_window_summaries
+                GROUP BY start_at, end_at
+                ORDER BY start_at ASC, end_at ASC
+                """
+            ).fetchall()
+        return [
+            {
+                "start_at": row["start_at"],
+                "end_at": row["end_at"],
+                "company_count": int(row["company_count"] or 0),
+                "updated_at": row["updated_at"],
+            }
+            for row in rows
+        ]
+
+    def company_summaries_for_windows(
+        self,
+        windows: Iterable[tuple[str, str]],
+        ticker: str | None = None,
+    ) -> list[dict[str, Any]]:
+        """Saved digests for an explicit list of (start_at, end_at) window keys."""
+        keys = [(str(start), str(end)) for start, end in windows]
+        if not keys:
+            return []
+        normalized_ticker = (ticker or "").strip().upper() or None
+        rows: list[sqlite3.Row] = []
+        # Chunked so an archive with hundreds of saved windows stays under SQLite's
+        # bound-parameter ceiling.
+        chunk_size = 200
+        with self.connect() as conn:
+            for offset in range(0, len(keys), chunk_size):
+                chunk = keys[offset:offset + chunk_size]
+                clause = " OR ".join(["(start_at=? AND end_at=?)"] * len(chunk))
+                parameters: list[Any] = [value for key in chunk for value in key]
+                if normalized_ticker:
+                    clause = f"({clause}) AND ticker=?"
+                    parameters.append(normalized_ticker)
+                rows.extend(
+                    conn.execute(
+                        f"""SELECT ticker, start_at, end_at, summary_json, updated_at,
+                                   source_announcement_count
+                            FROM company_window_summaries
+                            WHERE {clause}""",
+                        parameters,
+                    ).fetchall()
+                )
+        return sorted(
+            (
+                {
+                    "ticker": str(row["ticker"]),
+                    "start_at": row["start_at"],
+                    "end_at": row["end_at"],
+                    "summary": json.loads(row["summary_json"]),
+                    "updated_at": row["updated_at"],
+                    "source_announcement_count": row["source_announcement_count"],
+                }
+                for row in rows
+            ),
+            key=lambda item: (item["ticker"], str(item["start_at"]), str(item["end_at"])),
+        )
+
     def save_llm_audit(
         self,
         *,

@@ -44,7 +44,10 @@ from .share_export import (
     SIGNALS_ONLY_SECTIONS,
     default_share_filename,
     load_share_bundle,
+    load_share_bundle_range,
     render_bundle,
+    share_filename_dates,
+    window_label,
     write_share_export,
 )
 from .stock_master import StockMasterCache
@@ -948,17 +951,74 @@ def library_run_events(run_id: str, limit: int = 1000) -> dict[str, Any]:
 
 def _share_bundle(payload: ShareRequest):
     settings = _active_settings()
-    start_at = parse_boundary(payload.start, settings.app_timezone, is_end=False)
-    end_at = parse_boundary(payload.end, settings.app_timezone, is_end=True)
     if payload.signals_only and payload.sections:
         raise HTTPException(status_code=422, detail="Use either signals_only or explicit sections")
     sections = SIGNALS_ONLY_SECTIONS if payload.signals_only else payload.sections or DEFAULT_SHARE_SECTIONS
+    ticker = (payload.ticker or "").strip().upper() or None
+
+    picked_windows = None if payload.window_keys is None else [tuple(key) for key in payload.window_keys]
+    if picked_windows is not None and not picked_windows:
+        raise HTTPException(status_code=422, detail="Select at least one saved window")
+
+    if payload.date_mode == "all" or picked_windows is not None:
+        picked_dates: dict[str, str] = {}
+        if picked_windows is not None and payload.start.strip() and payload.end.strip():
+            picked_dates = {
+                "start_at": parse_boundary(payload.start, settings.app_timezone, is_end=False).isoformat(),
+                "end_at": parse_boundary(payload.end, settings.app_timezone, is_end=True).isoformat(),
+            }
+        try:
+            bundle = load_share_bundle_range(
+                settings.database_path,
+                ticker=ticker,
+                sections=sections,
+                per_ticker=payload.per_ticker,
+                assume_timezone=settings.app_timezone,
+                window_keys=picked_windows,
+                date_mode=payload.date_mode if payload.date_mode != "exact" else "range",
+                **picked_dates,
+            )
+        except ValueError as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
+        if not bundle.companies:
+            raise HTTPException(
+                status_code=404,
+                detail="No saved company digests in the chosen windows"
+                if picked_windows is not None
+                else "No saved company summaries exist yet",
+            )
+        return settings, bundle
+
+    if not payload.start.strip() or not payload.end.strip():
+        raise HTTPException(status_code=422, detail="Start and end dates are required")
+    start_at = parse_boundary(payload.start, settings.app_timezone, is_end=False)
+    end_at = parse_boundary(payload.end, settings.app_timezone, is_end=True)
+    if end_at < start_at:
+        raise HTTPException(status_code=422, detail="End date must not precede the start date")
+
     try:
+        if payload.date_mode == "range":
+            bundle = load_share_bundle_range(
+                settings.database_path,
+                start_at=start_at.isoformat(),
+                end_at=end_at.isoformat(),
+                ticker=ticker,
+                sections=sections,
+                per_ticker=payload.per_ticker,
+                assume_timezone=settings.app_timezone,
+            )
+            if not bundle.companies:
+                raise HTTPException(
+                    status_code=404,
+                    detail="No saved company digests overlap these dates. Pick a wider range or use All saved dates.",
+                )
+            return settings, bundle
+
         bundle = load_share_bundle(
             settings.database_path,
             start_at=start_at.isoformat(),
             end_at=end_at.isoformat(),
-            ticker=(payload.ticker or "").strip().upper() or None,
+            ticker=ticker,
             sections=sections,
         )
         if not bundle.companies and "T23:59" in payload.end and payload.end.count(":") == 1:
@@ -967,7 +1027,7 @@ def _share_bundle(payload: ShareRequest):
                 settings.database_path,
                 start_at=start_at.isoformat(),
                 end_at=full_day_end.isoformat(),
-                ticker=(payload.ticker or "").strip().upper() or None,
+                ticker=ticker,
                 sections=sections,
             )
     except ValueError as exc:
@@ -975,6 +1035,36 @@ def _share_bundle(payload: ShareRequest):
     if not bundle.companies:
         raise HTTPException(status_code=404, detail="No saved company summaries found for this window")
     return settings, bundle
+
+
+@app.get("/api/share/windows")
+def share_windows() -> dict[str, Any]:
+    """The saved digest windows a date-range export can draw from."""
+    settings = _active_settings()
+    index = Database(settings.database_path).saved_window_index()
+    windows = [
+        {
+            "start_at": item["start_at"],
+            "end_at": item["end_at"],
+            "start_date": str(item["start_at"])[:10],
+            "end_date": str(item["end_at"])[:10],
+            "label": window_label(item["start_at"], item["end_at"]),
+            "company_count": item["company_count"],
+            "updated_at": item["updated_at"],
+        }
+        for item in index
+    ]
+    span = (
+        {
+            "start_at": windows[0]["start_at"],
+            "end_at": max(item["end_at"] for item in windows),
+            "start_date": min(item["start_date"] for item in windows),
+            "end_date": max(item["end_date"] for item in windows),
+        }
+        if windows
+        else None
+    )
+    return {"windows": windows, "span": span, "window_count": len(windows)}
 
 
 @app.post("/api/share/render")
@@ -988,6 +1078,10 @@ def render_share(payload: ShareRequest) -> dict[str, Any]:
         "sections": list(bundle.sections),
         "characters": len(text),
         "llm_calls": 0,
+        "date_mode": bundle.date_mode,
+        "window_count": len(bundle.window_keys) or 1,
+        "digest_count": len(bundle.digest_windows),
+        "covered_window": window_label(bundle.start_at, bundle.end_at),
     }
 
 
@@ -995,7 +1089,7 @@ def render_share(payload: ShareRequest) -> dict[str, Any]:
 def export_share(payload: ShareRequest) -> FileResponse:
     settings, bundle = _share_bundle(payload)
     destination = settings.data_dir / "share" / default_share_filename(
-        payload.format, ticker=bundle.ticker_filter
+        payload.format, ticker=bundle.ticker_filter, dates=share_filename_dates(bundle)
     )
     write_share_export(bundle, destination, fmt=payload.format)
     media_type = {

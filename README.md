@@ -94,6 +94,21 @@ idx-digest export-all \
   --format md
 ```
 
+Digests are saved per exact run window. `--start/--end` alone matches one saved window; add
+`--range` to take every saved window overlapping those dates, or `--all-dates` to take every
+saved window there is. Both keep one digest per ticker (its newest window) unless you pass
+`--every-window`:
+
+```bash
+idx-digest export-all --range --start 2026-08-10 --end 2026-08-15 --format md
+idx-digest export-all --all-dates --format md
+```
+
+The workspace's **Copy / export all** panel offers the same three choices — *Current scope*,
+*Pick dates*, and *All saved dates* — over a list of every saved window. Picked dates preselect
+the windows they touch; clicking a window includes or excludes it, which is the only way to
+isolate one window when saved windows overlap.
+
 Use `idx-digest --help` and `idx-digest COMMAND --help` for all options.
 
 ## Configuration

@@ -16,3 +16,6 @@ data/traces/
 data/last_run.json
 .DS_Store
 data/
+
+# Private working folder: scraped source PDFs, generated digests, personal analysis.
+khusus/

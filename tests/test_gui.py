@@ -158,6 +158,183 @@ def test_share_api_renders_saved_company_digests(tmp_path, monkeypatch) -> None:
     assert "Corporate action signal" in body["text"]
 
 
+def _seed_share_windows(tmp_path):
+    from idx_digest.db import Database
+
+    def summary(ticker: str, marker: str) -> dict:
+        return {
+            "ticker": ticker,
+            "announcement_count": 1,
+            "overview": f"{ticker} {marker} overview",
+            "timeline": [],
+            "material_changes": [],
+            "key_financial_figures": [],
+            "corporate_actions": [f"{marker} corporate action"],
+            "expansion_projects": [],
+            "management_or_control_changes": [],
+            "capital_structure_events": [],
+            "listing_or_regulatory_events": [],
+            "analytical_scenarios": [],
+            "risks_or_uncertainties": [],
+            "items_to_monitor": [],
+            "limitations": [],
+        }
+
+    db = Database(tmp_path / "data" / "idx_digest.sqlite3")
+    db.save_company_summary(
+        "ANTM", "2026-07-06T00:00:00+07:00", "2026-08-06T23:59:59.999999+07:00",
+        summary("ANTM", "July"), "model",
+    )
+    db.save_company_summary(
+        "ANTM", "2026-08-10T00:00:00+07:00", "2026-08-15T19:59:00+07:00",
+        summary("ANTM", "August"), "model",
+    )
+    db.save_company_summary(
+        "BIRD", "2026-08-10T00:00:00+07:00", "2026-08-15T19:59:00+07:00",
+        summary("BIRD", "August"), "model",
+    )
+    return db
+
+
+def test_share_windows_endpoint_lists_pickable_saved_windows(tmp_path, monkeypatch) -> None:
+    monkeypatch.chdir(tmp_path)
+    _seed_share_windows(tmp_path)
+    body = TestClient(app).get("/api/share/windows").json()
+
+    assert body["window_count"] == 2
+    assert [window["label"] for window in body["windows"]] == [
+        "2026-07-06 → 2026-08-06",
+        "2026-08-10 → 2026-08-15 19:59",
+    ]
+    assert body["windows"][0]["company_count"] == 1
+    assert body["windows"][1]["company_count"] == 2
+    assert body["span"] == {
+        "start_at": "2026-07-06T00:00:00+07:00",
+        "end_at": "2026-08-15T19:59:00+07:00",
+        "start_date": "2026-07-06",
+        "end_date": "2026-08-15",
+    }
+
+
+def test_share_render_supports_picked_range_and_all_dates(tmp_path, monkeypatch) -> None:
+    monkeypatch.chdir(tmp_path)
+    _seed_share_windows(tmp_path)
+    client = TestClient(app)
+    payload = {"format": "txt", "sections": ["overview", "corporate_actions"]}
+
+    picked = client.post(
+        "/api/share/render",
+        json={**payload, "date_mode": "range", "start": "2026-08-12", "end": "2026-08-20"},
+    ).json()
+    assert picked["company_count"] == 2
+    assert picked["date_mode"] == "range" and picked["window_count"] == 1
+    assert "August corporate action" in picked["text"]
+    assert "July corporate action" not in picked["text"]
+
+    everything = client.post("/api/share/render", json={**payload, "date_mode": "all"}).json()
+    assert everything["company_count"] == 2
+    assert everything["date_mode"] == "all"
+    assert everything["digest_count"] == 2
+    # Both companies resolve to the August window, so July contributes nothing.
+    assert everything["window_count"] == 1
+    assert "July corporate action" not in everything["text"]
+
+    every_window = client.post(
+        "/api/share/render", json={**payload, "date_mode": "all", "per_ticker": "all"}
+    ).json()
+    assert every_window["digest_count"] == 3
+    assert every_window["window_count"] == 2
+    assert "July corporate action" in every_window["text"]
+
+
+def test_share_render_exports_exactly_the_chosen_saved_windows(tmp_path, monkeypatch) -> None:
+    monkeypatch.chdir(tmp_path)
+    _seed_share_windows(tmp_path)
+    client = TestClient(app)
+    payload = {"format": "txt", "sections": ["overview", "corporate_actions"]}
+    july = ["2026-07-06T00:00:00+07:00", "2026-08-06T23:59:59.999999+07:00"]
+
+    # The two windows overlap in the calendar, so no date range can isolate July —
+    # naming the window key can.
+    only_july = client.post(
+        "/api/share/render", json={**payload, "date_mode": "range", "window_keys": [july]}
+    ).json()
+    assert only_july["window_count"] == 1
+    assert only_july["company_count"] == 1
+    assert "July corporate action" in only_july["text"]
+    assert "August corporate action" not in only_july["text"]
+    assert only_july["covered_window"] == "2026-07-06 → 2026-08-06"
+
+    empty = client.post(
+        "/api/share/render", json={**payload, "date_mode": "range", "window_keys": []}
+    )
+    assert empty.status_code == 422
+
+    unknown = client.post(
+        "/api/share/render",
+        json={**payload, "date_mode": "range", "window_keys": [["2020-01-01T00:00:00+07:00", "2020-01-02T00:00:00+07:00"]]},
+    )
+    assert unknown.status_code == 404
+
+
+def test_range_export_states_the_period_of_every_digest(tmp_path, monkeypatch) -> None:
+    monkeypatch.chdir(tmp_path)
+    _seed_share_windows(tmp_path)
+    body = TestClient(app).post(
+        "/api/share/render",
+        json={
+            "format": "md",
+            "sections": ["overview"],
+            "date_mode": "range",
+            "start": "2026-08-01",
+            "end": "2026-08-31",
+            "per_ticker": "all",
+        },
+    ).json()
+
+    # A picked range that catches the July window must not be labelled as August only.
+    assert "**Covered:** 2026-07-06 → 2026-08-15 19:59" in body["text"]
+    assert "**Dates picked:** 2026-08-01 → 2026-08-31" in body["text"]
+    assert body["text"].count("**Window:** 2026-07-06 → 2026-08-06") == 1
+    assert body["text"].count("**Window:** 2026-08-10 → 2026-08-15 19:59") == 2
+
+
+def test_share_range_rejects_empty_and_inverted_selections(tmp_path, monkeypatch) -> None:
+    monkeypatch.chdir(tmp_path)
+    _seed_share_windows(tmp_path)
+    client = TestClient(app)
+    payload = {"format": "txt", "sections": ["overview"]}
+
+    missing = client.post("/api/share/render", json={**payload, "date_mode": "range", "start": "2026-09-01", "end": "2026-09-30"})
+    assert missing.status_code == 404
+    assert "All saved dates" in missing.json()["detail"]
+
+    inverted = client.post("/api/share/render", json={**payload, "date_mode": "range", "start": "2026-08-20", "end": "2026-08-12"})
+    assert inverted.status_code == 422
+
+    blank = client.post("/api/share/render", json={**payload, "date_mode": "range", "start": "", "end": ""})
+    assert blank.status_code == 422
+
+
+def test_share_modal_exposes_date_pickers() -> None:
+    html = TestClient(app).get("/").text
+    assert 'id="shareDatesScope"' in html and "Current scope" in html
+    assert 'id="shareDatesRange"' in html and "Pick dates" in html
+    assert 'id="shareDatesAll"' in html and "All saved dates" in html
+    assert 'id="shareStartDate" type="date"' in html
+    assert 'id="shareEndDate" type="date"' in html
+    # The saved-window list must not be hidden behind a mode, and each entry must be
+    # individually clickable — a calendar range alone cannot isolate overlapping windows.
+    assert '<div class="share-windows" id="shareWindows">' in html
+    assert "Saved windows · click to include or exclude" in html
+    assert 'role="checkbox"' in html and "toggleShareWindow" in html
+    assert "window_keys:chosen.map" in html
+    assert "onShareRangeChanged" in html
+    assert 'input[type="date"]' in html
+    assert "[hidden]{display:none!important}" in html
+    assert any(getattr(route, "path", None) == "/api/share/windows" for route in app.routes)
+
+
 def test_gui_responsive_containment_contract() -> None:
     client = TestClient(app)
     html = client.get("/").text
