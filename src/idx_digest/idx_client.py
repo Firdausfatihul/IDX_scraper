@@ -8,6 +8,11 @@ from typing import Any, Iterator
 import httpx
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential_jitter
 
+try:  # Optional dependency: TLS-fingerprint impersonation transport.
+    from curl_cffi import requests as curl_requests
+except ImportError:  # pragma: no cover - exercised only when extra is absent
+    curl_requests = None
+
 from .browser_transport import IDXBrowserTransport
 from .config import Settings
 from .observability import RunObserver
@@ -22,6 +27,14 @@ class RetryableHTTPError(RuntimeError):
     pass
 
 
+class ImpersonateChallenge(IDXResponseError):
+    """A Cloudflare block encountered under TLS impersonation.
+
+    Distinct from a generic ``IDXResponseError`` so the caller can rotate to
+    another impersonation profile before escalating to the browser transport.
+    """
+
+
 class IDXClient:
     ENDPOINT = "/primary/ListedCompany/GetAnnouncement"
     STOCK_MASTER_ENDPOINT = "/primary/ListedCompany/GetCompanyProfiles"
@@ -31,6 +44,11 @@ class IDXClient:
         self.observer = observer
         self.browser: IDXBrowserTransport | None = None
         self.use_browser = settings.idx_transport == "browser"
+        # Once TLS impersonation clears Cloudflare, latch to it so later pages
+        # skip the httpx path that would 403 again on every request.
+        self.use_impersonate = settings.idx_transport == "impersonate"
+        self._curl: Any = None
+        self._curl_profile: str | None = None
 
         headers = {
             "Accept": "application/json, text/plain, */*",
@@ -99,6 +117,11 @@ class IDXClient:
 
     def close(self) -> None:
         self.client.close()
+        if self._curl is not None:
+            try:
+                self._curl.close()
+            except Exception:
+                pass
         if self.browser is not None:
             self.browser.close()
 
@@ -152,15 +175,156 @@ class IDXClient:
             raise IDXResponseError("IDX response does not contain the expected Replies field")
         return payload
 
+    def _impersonate_profiles(self) -> list[str]:
+        """Ordered, de-duplicated impersonation profiles to try before the browser.
+
+        A rare intermittent Cloudflare challenge on one Chrome fingerprint clears
+        on a retry with another. Rotating profiles keeps the browser fallback from
+        firing on a transient 403 (which would otherwise flash a Chromium window).
+        """
+        configured = getattr(self.settings, "idx_impersonate_profile", "chrome131") or "chrome131"
+        order = [configured, "chrome131", "chrome124", "chrome120", "chrome116"]
+        seen: set[str] = set()
+        return [p for p in order if p and not (p in seen or seen.add(p))]
+
+    def _session_for(self, profile: str) -> Any:
+        """Return a curl_cffi session for ``profile``, reusing the last one if it matches."""
+        if curl_requests is None:
+            raise IDXResponseError(
+                "curl_cffi is not installed; the 'impersonate' transport is unavailable. "
+                "Install it with `pip install curl_cffi`."
+            )
+        if self._curl is not None and self._curl_profile == profile:
+            return self._curl
+        headers = {
+            "Accept": "application/json, text/plain, */*",
+            "Accept-Language": "id-ID,id;q=0.9,en-US;q=0.7,en;q=0.6",
+            "Referer": f"{self.settings.idx_base_url}/id/perusahaan-tercatat/keterbukaan-informasi",
+            "X-Requested-With": "XMLHttpRequest",
+        }
+        if self.settings.idx_cookie:
+            headers["Cookie"] = self.settings.idx_cookie
+        if self._curl is not None:
+            try:
+                self._curl.close()
+            except Exception:
+                pass
+        # Let impersonate supply the User-Agent so it stays consistent with the
+        # spoofed TLS fingerprint; overriding it can defeat the impersonation.
+        self._curl = curl_requests.Session(headers=headers, impersonate=profile, timeout=45)
+        self._curl_profile = profile
+        return self._curl
+
+    @retry(
+        retry=retry_if_exception_type(RetryableHTTPError),
+        wait=wait_exponential_jitter(initial=1, max=20),
+        stop=stop_after_attempt(4),
+        reraise=True,
+    )
+    def _impersonate_once(
+        self, profile: str, endpoint: str, params: dict[str, Any], *, require_replies: bool
+    ) -> dict[str, Any]:
+        started = time.perf_counter()
+        session = self._session_for(profile)
+        url = f"{self.settings.idx_base_url}{endpoint}"
+        try:
+            response = session.get(url, params=params)
+        except Exception as exc:  # curl_cffi network/transport failure -> retryable
+            raise RetryableHTTPError(f"impersonate transport error: {exc}") from exc
+        status = int(response.status_code)
+        content_type = (response.headers.get("content-type") or "").lower()
+        if self.observer:
+            self.observer.event(
+                "idx",
+                "impersonate metadata response",
+                profile=profile,
+                status=status,
+                content_type=content_type,
+                bytes=len(response.content),
+                elapsed_seconds=f"{time.perf_counter() - started:.3f}",
+            )
+        if status == 429 or status >= 500:
+            raise RetryableHTTPError(f"IDX returned HTTP {status}")
+        if status == 403 or (status < 400 and "json" not in content_type):
+            # Cloudflare challenge under this fingerprint -> rotate to another profile.
+            raise ImpersonateChallenge(
+                f"IDX challenged impersonation profile {profile!r} (status {status}, {content_type!r})"
+            )
+        if status >= 400:
+            raise IDXResponseError(f"IDX returned HTTP {status} under impersonation")
+        payload = response.json()
+        if not isinstance(payload, dict):
+            raise IDXResponseError("IDX response is not a JSON object")
+        if require_replies and "Replies" not in payload:
+            raise IDXResponseError("IDX response does not contain the expected Replies field")
+        return payload
+
+    def _impersonate_get_json(
+        self, endpoint: str, params: dict[str, Any], *, require_replies: bool = True
+    ) -> dict[str, Any]:
+        """Try each impersonation profile in turn; raise ImpersonateChallenge only if all are blocked."""
+        profiles = self._impersonate_profiles()
+        if self.observer:
+            self.observer.event(
+                "idx",
+                "impersonate metadata request",
+                endpoint=endpoint,
+                profiles=",".join(profiles),
+                index_from=params.get("indexFrom"),
+                page_size=params.get("pageSize"),
+                ticker=params.get("kodeEmiten") or "ALL",
+            )
+        last: ImpersonateChallenge | None = None
+        for profile in profiles:
+            try:
+                return self._impersonate_once(profile, endpoint, params, require_replies=require_replies)
+            except ImpersonateChallenge as exc:
+                last = exc
+                if self.observer:
+                    self.observer.event(
+                        "idx",
+                        "impersonation profile challenged; rotating",
+                        level="WARNING",
+                        profile=profile,
+                        error=str(exc),
+                    )
+                continue
+        raise ImpersonateChallenge(
+            f"all {len(profiles)} impersonation profiles blocked; last: {last}"
+        )
+
+    def _impersonate_with_fallback(
+        self, endpoint: str, params: dict[str, Any], *, require_replies: bool = True
+    ) -> dict[str, Any]:
+        """Try TLS impersonation (rotating profiles); only on a hard block escalate to the browser."""
+        try:
+            payload = self._impersonate_get_json(endpoint, params, require_replies=require_replies)
+            self.use_impersonate = True  # latch so subsequent pages skip httpx/retry
+            return payload
+        except (IDXResponseError, RetryableHTTPError) as exc:
+            if self.observer:
+                self.observer.event(
+                    "idx",
+                    "TLS impersonation failed; switching to Chromium",
+                    level="WARNING",
+                    always=True,
+                    endpoint=endpoint,
+                    error=str(exc),
+                )
+            return self.browser_transport().get_json(params, endpoint=endpoint, require_replies=require_replies)
+
     def _get_json(self, params: dict[str, Any]) -> dict[str, Any]:
         transport = self.settings.idx_transport
-        if transport not in {"auto", "http", "browser"}:
-            raise ValueError("IDX_TRANSPORT must be one of: auto, http, browser")
+        if transport not in {"auto", "http", "browser", "impersonate"}:
+            raise ValueError("IDX_TRANSPORT must be one of: auto, http, browser, impersonate")
 
         if self.use_browser or transport == "browser":
             if self.observer:
                 self.observer.event("idx", "metadata request using Chromium", transport=transport)
             return self.browser_transport().get_json(params)
+
+        if self.use_impersonate or transport == "impersonate":
+            return self._impersonate_with_fallback(self.ENDPOINT, params, require_replies=True)
 
         try:
             return self._get_json_http(params)
@@ -169,23 +333,23 @@ class IDXClient:
                 if self.observer:
                     self.observer.event(
                         "idx",
-                        "HTTP 403; switching all IDX requests to Chromium",
+                        "HTTP 403; trying TLS impersonation before Chromium",
                         level="WARNING",
                         always=True,
                     )
-                return self.browser_transport().get_json(params)
+                return self._impersonate_with_fallback(self.ENDPOINT, params, require_replies=True)
             raise
         except IDXResponseError as exc:
             if transport == "auto":
                 if self.observer:
                     self.observer.event(
                         "idx",
-                        "unexpected HTTP response; switching to Chromium",
+                        "unexpected HTTP response; trying TLS impersonation before Chromium",
                         level="WARNING",
                         always=True,
                         error=str(exc),
                     )
-                return self.browser_transport().get_json(params)
+                return self._impersonate_with_fallback(self.ENDPOINT, params, require_replies=True)
             raise
 
     def _get_json_endpoint(self, endpoint: str, params: dict[str, Any], *, require_replies: bool = False) -> dict[str, Any]:
@@ -193,6 +357,8 @@ class IDXClient:
         transport = self.settings.idx_transport
         if self.use_browser or transport == "browser":
             return self.browser_transport().get_json(params, endpoint=endpoint, require_replies=require_replies)
+        if self.use_impersonate or transport == "impersonate":
+            return self._impersonate_with_fallback(endpoint, params, require_replies=require_replies)
         try:
             response = self.client.get(endpoint, params=params)
             if response.status_code == 429 or response.status_code >= 500:
@@ -208,8 +374,8 @@ class IDXClient:
             status = getattr(getattr(exc, "response", None), "status_code", None)
             if transport == "auto" and (status == 403 or isinstance(exc, (httpx.TransportError, IDXResponseError, ValueError))):
                 if self.observer:
-                    self.observer.event("idx", "switching auxiliary IDX endpoint to Chromium", level="WARNING", endpoint=endpoint, error=str(exc))
-                return self.browser_transport().get_json(params, endpoint=endpoint, require_replies=require_replies)
+                    self.observer.event("idx", "auxiliary IDX endpoint blocked; trying TLS impersonation before Chromium", level="WARNING", endpoint=endpoint, error=str(exc))
+                return self._impersonate_with_fallback(endpoint, params, require_replies=require_replies)
             raise
 
     def stock_master_tickers(self) -> frozenset[str] | None:

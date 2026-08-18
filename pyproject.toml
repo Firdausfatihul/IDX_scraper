@@ -20,6 +20,7 @@ dependencies = [
   "openpyxl>=3.1,<4",
   "python-docx>=1.1,<2",
   "beautifulsoup4>=4.12,<5",
+  "curl_cffi>=0.7,<1",
   "playwright>=1.50,<2",
   "rich>=13.8,<16",
   "fastapi>=0.115,<1",
